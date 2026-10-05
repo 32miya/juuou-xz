@@ -337,6 +337,58 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   <div id="highStatJudge" style="font-size:13px;line-height:1.7"></div>
 </div>
 
+<!-- ⑨ SC中モード＆超サバ攻略 -->
+<div class="card">
+  <div class="ch">SC中モード＆超サバ攻略（p-gabu.jp 情報）</div>
+
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ サバ連2連目以降のモード振り分け</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--mu)">チャンス</div>
+      <div style="font-size:20px;font-weight:800;color:var(--ye)">80%</div>
+      <div style="font-size:10px;color:var(--mu)">ベル 1/42.7</div>
+    </div>
+    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--mu)">天国</div>
+      <div style="font-size:20px;font-weight:800;color:var(--or)">18.8%</div>
+      <div style="font-size:10px;color:var(--mu)">ベル 1/7.5</div>
+    </div>
+    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--mu)">超天国</div>
+      <div style="font-size:20px;font-weight:800;color:var(--pu)">1.2%</div>
+      <div style="font-size:10px;color:var(--mu)">ベル 1/7.5</div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ 超サバへの道</div>
+  <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:13px;line-height:1.8">
+    ・モード中に<strong>押し順ベル当選 → REG</strong>で超サバストック濃厚<br>
+    ・超サバ抽選は<span style="color:var(--ye)">SC2連目以降</span>から開始<br>
+    ・<span style="color:var(--rd);font-weight:700">SC5連目以降 → 超サバ現実的なチャンス</span><br>
+    ・超サバ獲得後は期待枚数 <span style="color:var(--gn);font-weight:700">3,000枚OVER</span>
+  </div>
+
+  <div style="font-size:11px;color:var(--mu);margin:8px 0 4px">▼ ボーナス継続G数</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--mu)">BB（ビッグ）</div>
+      <div style="font-size:22px;font-weight:800;color:var(--ye)">15G</div>
+    </div>
+    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--mu)">RB（レギュラー）</div>
+      <div style="font-size:22px;font-weight:800;color:var(--gn)">10G</div>
+      <div style="font-size:10px;color:var(--mu)">超サバ濃厚</div>
+    </div>
+  </div>
+
+  <div style="font-size:11px;color:var(--mu);margin:8px 0 4px">▼ SC高確の移行トリガー</div>
+  <div style="background:var(--c2);border-radius:8px;padding:8px;font-size:12px;line-height:1.8">
+    チャンス目 → SC高確移行期待度 <strong style="color:var(--ye)">約40%</strong><br>
+    SC高確中 → 全役でSC抽選<br>
+    設定差: 百の位偶数G（200G・400G等）での移行率
+  </div>
+</div>
+
 <!-- ⑩ セッション履歴 -->
 <div class="card">
   <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
@@ -736,7 +788,12 @@ function buildQuitLine() {
   const rem = ceil - S.g;
   switch(S.mode) {
     case 'sp':     return '<span class="trd">⚑ SP高確中 — 100G継続必須</span>';
-    case 'at':     return '<span class="tye">🎰 AT消化中 — 終了後も潜伏29G必須</span>';
+    case 'at': {
+      const sc2 = S.scCount;
+      if (sc2 >= 5) return '<span class="trd">🔥 SC' + sc2 + '連目 — 超サバ現実圏！REGを逃すな</span>';
+      if (sc2 >= 2) return '<span class="tye">⚡ SC' + sc2 + '連目 — 超サバ抽選中。終了後も潜伏29G必須</span>';
+      return '<span class="tye">🎰 AT消化中 — 終了後も潜伏29G必須</span>';
+    }
     case 'high':   return '<span class="tgn">✅ SC高確 — SC当選まで継続</span>';
     case 'mystery':return '<span class="tpu">💜 謎高確 — 継続推奨</span>';
     case 'latent': return S.latG>=29
@@ -781,7 +838,11 @@ function renderContGuide() {
     return `<div class="cbox ${must?'must':''}"><div class="cb-l">${label}${must?' ⚑':''}</div><div class="cb-r" style="color:${must?'var(--rd)':'var(--tx)'}">${rt}</div><div class="cb-c">${ct}</div><div class="cb-n">${note2}</div></div>`;
   };
   let html='';
-  if(S.mode==='at'){html=box('AT消化中',-1,'ヤメ不可',true)+box('終了後:潜伏29G',-1,'即ヤメ厳禁',true);}
+  if(S.mode==='at'){
+    const scn=S.scCount;
+    const superLbl = scn>=5?'🔥超サバ現実圏':scn>=2?'超サバ抽選中':'—';
+    html=box('AT消化中 '+scn+'連目',-1,superLbl,true)+box('終了後:潜伏29G',-1,'即ヤメ厳禁',true);
+  }
   else if(S.mode==='latent'){const rl=29-S.latG;html=rl>0?box('潜伏完了まで',rl,'絶対ヤメない',true)+box('完了後100G',Math.max(0,100-g),'SC高確移行期待'):box('潜伏完了✓',0,'ヤメ判断OK')+box('推奨:100G+α',Math.max(0,100-g),'SP高確移行50%期待');}
   else if(S.mode==='sp'){html=box('必須:100G',Math.max(0,100-g),'SP高確消化必須',true)+box('天井'+ceil+'G',rem,'SC/BIG/REG確定',rem<=300);}
   else if(S.mode==='high'||S.mode==='mystery'||S.mode==='bonus'){html=box('SC当選まで',-1,'継続必須',true)+box('天井'+ceil+'G',rem,'SC/BIG/REG確定');}
@@ -803,7 +864,13 @@ function buildAdvice() {
   const g=S.g, ceil=S.isReset?CEIL_R:CEIL_N, rem=ceil-g;
   const av=(t,title,body)=>{const c={red:'ared',yellow:'ayel',green:'agreen',blue:'ablue',purp:'apurp'}[t];return`<div class="adv ${c}"><div class="adv-t">${title}</div><div class="adv-b">${body}</div></div>`;};
   switch(S.mode){
-    case 'at':     return av('green','🎰 AT消化中','消化中はレア役でボーナス抽選あり。<br>終了後は<strong>潜伏29G消化まで絶対にヤメない</strong>こと。');
+    case 'at': {
+      const sc = S.scCount;
+      const superNote = sc >= 5 ? '<br>🔥 <strong>SC' + sc + '連目 → 超サバ現実圏！REGを狙え</strong>' :
+                        sc >= 2 ? '<br>⚡ SC' + sc + '連目 — 超サバ抽選中（5連目から現実的）' : '';
+      const modeNote = sc >= 2 ? '<br>モード: チャンス80% / 天国18.8% / 超天国1.2%' : '';
+      return av('green','🎰 AT消化中 (' + (sc||1) + '連目)','消化中はレア役でボーナス抽選あり。<br>終了後は<strong>潜伏29G消化まで絶対にヤメない</strong>こと。' + superNote + modeNote);
+    }
     case 'latent': return S.latG>=29?av('yellow','⚠️ 潜伏完了 → ヤメ判断','ストックなし確認後ヤメOK。<br>余裕があれば<strong>100G継続</strong>推奨。'):av('red','⛔ 潜伏中 '+S.latG+'/29G — 残り'+(29-S.latG)+'G','<strong>絶対にヤメないこと。</strong>毎G全役でストック放出抽選中。<br>レア役 → サバ連昇格チャンス。');
     case 'sp':     return av('red','🔴 SP高確！継続必須','次のSC当選でサバ連濃厚！<br><strong>100G超まで絶対継続。</strong>');
     case 'high':   return av('green','✅ SC高確中','全役でSC抽選中（期待度 約50%）。<br>チャンス目・チェリーに注目。');
