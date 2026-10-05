@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>L獣王XZ 攻略</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--card:#161b22;--c2:#1c2128;--bd:#30363d;--tx:#f0f6fc;--mu:#7d8590;--ye:#f0a83a;--gn:#3fb950;--rd:#f85149;--bl:#58a6ff;--pu:#bc8cff;--or:#ffa657}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica Neue',sans-serif;max-width:480px;margin:0 auto;font-size:14px}
+.hdr{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--bd);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hdr-title{font-size:13px;font-weight:700;color:var(--ye);white-space:nowrap}
+.rate-sel{display:flex;gap:3px}
+.rb{padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--c2);color:var(--mu);font-size:12px;font-weight:700;cursor:pointer}
+.rb.on{background:var(--ye);color:#000;border-color:var(--ye)}
+.hdr-bal{font-size:18px;font-weight:800;white-space:nowrap}
+.pos{color:var(--gn)} .neg{color:var(--rd)} .zero{color:var(--mu)}
+.page{padding:10px 10px 32px}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
+.ch{font-size:10px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* TOP CARD */
+.top-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.top-date{font-size:13px;color:var(--mu)}
+.top-mac{font-size:15px;font-weight:700;color:var(--ye)}
+.sts-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+.sts-tbl th{font-size:10px;color:var(--mu);padding:3px 4px;text-align:center;border-bottom:1px solid var(--bd)}
+.sts-tbl td{padding:5px 4px;text-align:center;border-bottom:1px solid var(--c2)}
+.sts-tbl td:first-child{text-align:left;color:var(--mu);font-size:12px}
+.est-row{display:flex;align-items:baseline;gap:8px;padding:8px 0 4px}
+.est-val{font-size:28px;font-weight:900;line-height:1}
+.est-note{font-size:12px;color:var(--mu)}
+.quit-row{font-size:13px;padding:6px 0 2px;line-height:1.5}
+
+/* STATE */
+.state-wrap{display:flex;align-items:center;gap:10px;padding:4px 0}
+.state-lbl{font-size:38px;font-weight:900;line-height:1}
+.state-sub{font-size:12px;color:var(--mu);line-height:1.5;flex:1}
+.sn{color:var(--bl)} .sh{color:var(--gn)} .ssp{color:var(--rd)}
+.sm{color:var(--pu)} .sat{color:var(--ye)} .slat{color:#a78bfa} .sbon{color:#ffd700}
+
+/* G COUNT */
+.g-main{display:flex;align-items:flex-end;gap:6px;margin-bottom:8px}
+.g-tap{font-size:60px;font-weight:900;color:var(--bl);line-height:1;background:none;border:2px solid var(--bd);border-radius:10px;padding:8px 14px;cursor:pointer;flex:1;text-align:center}
+.g-tap:active{background:var(--c2)}
+.g-unit{font-size:13px;color:var(--mu);align-self:flex-end;padding-bottom:10px}
+.g-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.bar-hd{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:3px}
+.bar-bg{background:var(--bd);border-radius:3px;height:7px}
+.bar-fill{height:100%;border-radius:3px;transition:width .35s,background .35s}
+.bfar{background:var(--gn)} .bmid{background:var(--ye)} .bnear{background:var(--rd)} .bzone{background:#8b5cf6;animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.ctag{display:inline-block;font-size:13px;font-weight:700;padding:4px 12px;border-radius:16px;margin-top:6px}
+.ctfar{background:#0d2618;color:var(--gn)} .ctmid{background:#271a00;color:var(--ye)}
+.ctnear{background:#2d0f0f;color:var(--rd)} .ctzone{background:#1e0e38;color:#a78bfa;animation:blink .7s infinite}
+
+/* CONTINUE CARD */
+.exp-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.exp-lbl{font-size:13px;font-weight:700}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cbox{background:var(--c2);border-radius:8px;padding:10px;text-align:center;border:1px solid transparent}
+.cbox.must{border-color:var(--rd)}
+.cb-l{font-size:10px;color:var(--mu);margin-bottom:3px}
+.cb-r{font-size:21px;font-weight:900;line-height:1;margin-bottom:2px}
+.cb-c{font-size:12px;font-weight:700;color:var(--ye);height:16px}
+.cb-n{font-size:10px;color:var(--mu);margin-top:3px;line-height:1.3}
+
+/* ADVICE */
+.adv{border-radius:10px;padding:12px 14px;border-left:5px solid;margin-bottom:10px}
+.adv-t{font-size:15px;font-weight:700;margin-bottom:4px}
+.adv-b{font-size:13px;line-height:1.65}
+.ared{background:rgba(127,29,29,.9);border-color:var(--rd)}
+.ayel{background:rgba(120,53,15,.85);border-color:var(--ye)}
+.agreen{background:rgba(6,58,29,.9);border-color:var(--gn)}
+.ablue{background:rgba(17,44,100,.9);border-color:var(--bl)}
+.apurp{background:rgba(60,25,120,.9);border-color:var(--pu)}
+
+/* BUTTONS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.row{display:flex;gap:6px;margin-bottom:6px}
+.row .btn{flex:1}
+.btn{padding:12px 6px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;text-align:center;line-height:1.2;transition:transform .1s,opacity .1s}
+.btn:active{transform:scale(.93);opacity:.75}
+.btn-sm{padding:9px 6px;font-size:12px}
+.btn-xs{padding:7px 6px;font-size:11px}
+.btn-lg{padding:15px 6px;font-size:15px}
+.cgray{background:#21262d;color:#8b949e}
+.cgreen{background:#0f2818;color:var(--gn)}
+.cyel{background:#271a00;color:var(--ye)}
+.cred{background:#2d0f0f;color:var(--rd)}
+.cblue{background:#0d1f40;color:var(--bl)}
+.cpurp{background:#1e0c38;color:var(--pu)}
+.corange{background:#2d1500;color:var(--or)}
+.cpri{background:#b91c1c;color:#fff}
+
+/* COUNTERS */
+.ctr{display:flex;align-items:center;gap:8px}
+.ctr-num{flex:1;text-align:center;font-size:40px;font-weight:900;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:8px;cursor:pointer;line-height:1}
+.ctr-num:active{background:var(--c2)}
+.ctr-btn{width:50px;height:50px;border:none;border-radius:8px;font-size:24px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ctr-btn:active{opacity:.7;transform:scale(.9)}
+.lat-num{font-size:46px;font-weight:900;color:#a78bfa;line-height:1;cursor:pointer;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:8px 14px;text-align:center;min-width:90px}
+.lat-num:active{background:var(--c2)}
+
+/* TRIGGERS */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.trig{padding:14px 8px;border-radius:10px;border:2px solid transparent;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:transform .1s,border-color .3s}
+.trig:active{transform:scale(.93)}
+.trico{font-size:28px}
+.trn{font-size:13px;text-align:center;line-height:1.3}
+.trd{font-size:10px;text-align:center;opacity:.75;line-height:1.3}
+.tA{background:#0d1a0a;color:#86efac} .tB{background:#1a1200;color:#fde68a}
+.tC{background:#1a0920;color:#e879f9} .tD{background:#041a10;color:#6ee7b7}
+.trig.fired{border-color:currentColor;background:rgba(255,255,255,.06)}
+
+/* BALANCE */
+.bal-big{text-align:center;padding:12px 0}
+.bal-big .lbl{font-size:11px;color:var(--mu);margin-bottom:4px}
+.bal-big .amt{font-size:44px;font-weight:900;line-height:1}
+.bal-big .sub{font-size:12px;color:var(--mu);margin-top:4px}
+.ifield{background:#21262d;border:1px solid var(--bd);color:#fff;border-radius:6px;padding:8px 10px;font-size:16px;text-align:right;-webkit-appearance:none;width:110px}
+.ifield::-webkit-outer-spin-button,.ifield::-webkit-inner-spin-button{-webkit-appearance:none}
+.inv-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.inv-row label{flex:1;font-size:13px;color:var(--mu)}
+.auto-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.auto-row:last-child{border-bottom:none}
+.auto-row .lbl2{color:var(--mu)}
+
+/* HISTORY */
+.hist-item{padding:8px;border-bottom:1px solid var(--bd);font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.hist-item:last-child{border-bottom:none}
+.hist-left{color:var(--mu);line-height:1.5}
+.hist-right{font-weight:700;text-align:right}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:18px 18px 0 0;padding:20px 16px 32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-t{font-size:17px;font-weight:700;margin-bottom:14px}
+.modal-x{float:right;color:var(--mu);font-size:24px;cursor:pointer;line-height:1;margin-top:-2px}
+
+/* NUMPAD */
+.kp-disp{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:36px;font-weight:800;text-align:right;margin-bottom:12px;min-height:60px;color:#fff;overflow:hidden}
+.kp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kp{padding:15px;font-size:22px;font-weight:700;background:#21262d;border:none;border-radius:8px;color:#fff;cursor:pointer}
+.kp:active{background:#30363d}
+.kp-del{background:#2d0f0f;color:#fca5a5}
+.kp-ok{background:#0f2818;color:var(--gn);font-size:17px}
+.kp-0{grid-column:span 2}
+.div-line{border:none;border-top:1px solid var(--bd);margin:10px 0}
+.log{background:var(--bg);border-radius:8px;padding:8px;max-height:100px;overflow-y:auto;font-size:12px;color:var(--mu)}
+.li{padding:3px 0;border-bottom:1px solid var(--card)}
+.li:last-child{border-bottom:none}
+.lt{color:#484f58;margin-right:5px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--ye);color:var(--ye);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;text-align:center;z-index:300;opacity:0;transition:opacity .2s;pointer-events:none;max-width:340px;width:92%;line-height:1.4}
+.toast.show{opacity:1}
+.bold{font-weight:700} .trd{color:var(--rd)} .tye{color:var(--ye)} .tgn{color:var(--gn)} .tbl{color:var(--bl)} .tpu{color:var(--pu)}
+.sec-lbl{font-size:11px;color:var(--mu);margin:8px 0 4px}
+.big-inp{width:100%;background:var(--c2);border:2px solid var(--bd);border-radius:10px;color:var(--tx);font-size:32px;font-weight:900;padding:10px 8px;text-align:center;-webkit-appearance:none;outline:none;transition:border-color .2s}
+.big-inp:focus{border-color:var(--bl)}
+.big-inp::placeholder{color:var(--bd)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-title">🦁 L獣王XZ</div>
+  <div class="rate-sel">
+    <button class="rb on" id="rb20" onclick="setRate(20)">20円</button>
+    <button class="rb" id="rb10" onclick="setRate(10)">10円</button>
+    <button class="rb" id="rb5"  onclick="setRate(5)">5円</button>
+  </div>
+  <div class="hdr-bal zero" id="hdrBal">±0円</div>
+</div>
+
+<div class="page">
+
+<!-- ① 上部ステータスカード -->
+<div class="card">
+  <div class="top-hd">
+    <div>
+      <div class="top-date" id="topDate">—</div>
+      <div class="top-mac" id="topMac">第1台目</div>
+    </div>
+    <button class="btn cyel btn-sm" onclick="openChangeMachine()">台変更 ▶</button>
+  </div>
+
+  <table class="sts-tbl">
+    <thead><tr><th></th><th>今日</th><th>通算</th></tr></thead>
+    <tbody>
+      <tr><td>総G</td><td id="s-tG">0G</td><td id="s-aG" class="tbl">0G</td></tr>
+      <tr><td>SC回数</td><td id="s-tSC">0回</td><td id="s-aSC" class="tbl">0回</td></tr>
+      <tr><td>平均初当たり</td><td id="s-tAvg">—</td><td id="s-aAvg" class="tbl">—</td></tr>
+      <tr><td>最大連続</td><td id="s-tRen">—</td><td id="s-aRen" class="tbl">—</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:10px;color:var(--mu);text-align:right;margin-top:-6px;margin-bottom:6px" id="s-aCount">0セッション蓄積</div>
+
+  <hr class="div-line">
+
+  <div class="est-row">
+    <span style="font-size:11px;color:var(--mu)">推定設定</span>
+    <span class="est-val" id="topEst">—</span>
+    <span class="est-note" id="topEstNote">データ不足</span>
+  </div>
+  <div class="quit-row" id="topQuit">—</div>
+</div>
+
+<!-- ① 手動入力 -->
+<div class="card">
+  <div class="ch">手動入力（セッション総G数 / SC回数）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:5px">今日の総G数</div>
+      <input type="number" inputmode="numeric" class="big-inp" id="inputSessionG" placeholder="0" min="0" onchange="setSessionG(this.value)" onfocus="this.select()">
+      <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center">AT開始で自動加算</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:5px">SC回数（累計）</div>
+      <input type="number" inputmode="numeric" class="big-inp" id="inputSCCount" placeholder="0" min="0" onchange="setSCDirect(this.value)" onfocus="this.select()">
+      <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center">AT開始で自動カウント</div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 状態 -->
+<div class="card">
+  <div class="state-wrap">
+    <div class="state-lbl sn" id="stateLbl">通常</div>
+    <div class="state-sub" id="stateSub">通常遊技中<br>右1stペナルティ注意</div>
+  </div>
+</div>
+
+<!-- ③ 現在Gカウンター -->
+<div class="card">
+  <div class="ch">現在のG数（タップで入力）</div>
+  <div class="g-main">
+    <button class="g-tap" id="gDisp" onclick="openKP('g')">0</button>
+    <div class="g-unit">G</div>
+  </div>
+  <div class="g-btns">
+    <button class="btn cgray btn-sm" onclick="addG(-50)">-50</button>
+    <button class="btn cblue" onclick="addG(50)">+50</button>
+    <button class="btn cgray btn-sm" onclick="addG(100)">+100</button>
+    <button class="btn cgray btn-sm" onclick="addG(200)">+200</button>
+  </div>
+  <div style="margin-top:8px">
+    <div class="bar-hd"><span>0G</span><span id="barLbl">天井 999G</span></div>
+    <div class="bar-bg"><div class="bar-fill bfar" id="ceilBar" style="width:0%"></div></div>
+    <div><span class="ctag ctfar" id="ceilTag">天井まで 999G</span></div>
+  </div>
+</div>
+
+<!-- ④ 続行判断 -->
+<div class="card">
+  <div class="ch">続行判断</div>
+  <div class="exp-row">
+    <span style="font-size:11px;color:var(--mu)">SC当選期待度</span>
+    <span class="exp-lbl" id="scExpLbl">—</span>
+  </div>
+  <div class="bar-bg" style="height:10px;margin-bottom:5px">
+    <div id="scExpBar" style="height:100%;border-radius:3px;width:12%;transition:width .4s,background .4s;background:var(--mu)"></div>
+  </div>
+  <div style="font-size:12px;color:var(--mu);margin-bottom:10px" id="scExpNote">—</div>
+  <div style="font-size:10px;color:var(--mu);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase">推奨継続ライン</div>
+  <div class="cg" id="contLines"></div>
+</div>
+
+<!-- ⑤ アドバイス -->
+<div id="advBox"></div>
+
+<!-- ⑥ 状態変更 -->
+<div class="card">
+  <div class="ch">状態変更</div>
+  <div class="g2">
+    <button class="btn cgreen btn-lg" onclick="startAT()">🎰 AT開始</button>
+    <button class="btn cyel btn-lg" onclick="endAT()">✅ AT終了→潜伏</button>
+  </div>
+  <div class="g3">
+    <button class="btn cblue btn-sm" onclick="setMode('high')">SC高確</button>
+    <button class="btn cred btn-sm" onclick="setMode('sp')">SP高確</button>
+    <button class="btn cpurp btn-sm" onclick="setMode('mystery')">謎高確</button>
+  </div>
+  <div class="g3">
+    <button class="btn cgray btn-sm" onclick="setMode('normal')">通常</button>
+    <button class="btn corange btn-sm" onclick="doReset()">設定変更後</button>
+    <button class="btn cpurp btn-sm" onclick="endLatent()">潜伏終了</button>
+  </div>
+</div>
+
+<!-- ⑦ SC連続 + 潜伏G -->
+<div class="card">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div>
+      <div class="ch">SC連続回数</div>
+      <div class="ctr">
+        <button class="ctr-btn cgray" onclick="addSC(-1)">－</button>
+        <div class="ctr-num tye" id="scNum" onclick="openKP('sc')">0</div>
+        <button class="ctr-btn cyel" onclick="addSC(1)">＋</button>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--mu);margin-top:4px" id="scLabel">—</div>
+    </div>
+    <div>
+      <div class="ch">潜伏G（タップ入力）</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;margin-bottom:4px">
+        <div class="lat-num" id="latDisp" onclick="openKP('lat')">0</div>
+        <div style="font-size:16px;color:var(--mu);padding-bottom:10px">/ 29</div>
+      </div>
+      <div class="bar-bg" style="margin-bottom:4px"><div id="latBar" style="width:0%;height:100%;border-radius:3px;background:#8b5cf6;transition:width .3s"></div></div>
+      <div class="g2" style="margin-bottom:0">
+        <button class="btn cgray btn-xs" onclick="addLat(5)">+5G</button>
+        <button class="btn cgray btn-xs" onclick="addLat(10)">+10G</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑧ 4大トリガー -->
+<div class="card">
+  <div class="ch">4大サバンナトリガー（発生時タップ）</div>
+  <div class="tgrid">
+    <button class="trig tA" id="tA" onclick="fireTrig('A')"><span class="trico">🦒</span><span class="trn">キリン<br>サバチャン</span><span class="trd">ループ率80%or90%</span></button>
+    <button class="trig tB" id="tB" onclick="fireTrig('B')"><span class="trico">🔥</span><span class="trn">サバチャン<br>EX</span><span class="trd">30回ナビループ</span></button>
+    <button class="trig tC" id="tC" onclick="fireTrig('C')"><span class="trico">💥</span><span class="trn">100ナビ<br>フリーズ</span><span class="trd">ボーナス大量獲得</span></button>
+    <button class="trig tD" id="tD" onclick="fireTrig('D')"><span class="trico">👑</span><span class="trn">REG<br>ボーナス</span><span class="trd">超サバストック濃厚</span></button>
+  </div>
+  <div style="font-size:12px;color:var(--mu)" id="trigLog">未発生</div>
+</div>
+
+<!-- ⑧-b 高確突入率モニター -->
+<div class="card">
+  <div class="ch">高確率 突入成功率モニター</div>
+  <div id="highStatRows"></div>
+  <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">
+  <div id="highStatJudge" style="font-size:13px;line-height:1.7"></div>
+</div>
+
+<!-- ⑨ 収支（自動計算） -->
+<div class="card">
+  <div class="ch">収支（自動計算）</div>
+
+  <div class="inv-row" style="margin-bottom:10px">
+    <label>今セッション総G数</label>
+    <div style="display:flex;align-items:center;gap:6px">
+      <span style="font-size:18px;font-weight:700;color:var(--bl)" id="sessionGDisp">0G</span>
+      <button class="btn cgray btn-xs" onclick="openKP('sg')">修正</button>
+    </div>
+  </div>
+
+  <div class="inv-row">
+    <label>現在の持ち枚数</label>
+    <input type="number" inputmode="numeric" class="ifield" id="medals" value="0" min="0" onchange="calcBal()">
+  </div>
+
+  <hr class="div-line">
+  <div class="auto-row"><span class="lbl2">投資額（自動）</span><span id="autoInvest" class="bold">0円</span></div>
+  <div class="auto-row"><span class="lbl2">獲得額（自動）</span><span id="autoRecover" class="bold">0円</span></div>
+
+  <div class="bal-big">
+    <div class="lbl">収支</div>
+    <div class="amt zero" id="balAmt">±0円</div>
+    <div class="sub" id="balSub">差枚数: 0枚</div>
+  </div>
+
+  <div style="font-size:11px;color:var(--mu)">
+    レート: <span id="rateNote">20円/枚（1,000円=50枚）</span> ／ 31.8G/50枚
+  </div>
+</div>
+
+<!-- ⑩ セッション履歴 -->
+<div class="card">
+  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
+    <span>セッション履歴</span>
+    <button class="btn cgray btn-xs" onclick="toggleHistory()" style="padding:4px 8px">表示/非表示</button>
+  </div>
+  <div id="histWrap" style="margin-top:8px;display:none">
+    <div id="histList">記録なし</div>
+    <button class="btn cred btn-xs" style="width:100%;margin-top:8px" onclick="clearAllData()">全データ削除</button>
+  </div>
+</div>
+
+<!-- ⑪ ログ -->
+<div class="card">
+  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
+    <span>ログ</span>
+    <button class="btn cgray btn-xs" onclick="clearLog()" style="padding:4px 8px">クリア</button>
+  </div>
+  <div style="margin-top:8px"><div class="log" id="log"><div class="li"><span class="lt">--:--</span>開始</div></div></div>
+</div>
+
+</div><!-- /page -->
+
+<!-- 台変更モーダル -->
+<div class="overlay" id="chgModal" onclick="bgClose(event,'chgModal')">
+  <div class="modal">
+    <div class="modal-t">台変更 <span class="modal-x" onclick="closeModal('chgModal')">✕</span></div>
+
+    <div class="sec-lbl">現在の持ち枚数（この台の結果確定）</div>
+    <div class="inv-row" style="margin-bottom:14px">
+      <label>持ち枚数</label>
+      <input type="number" inputmode="numeric" class="ifield" id="chgMedals" value="0" min="0">
+    </div>
+
+    <hr class="div-line">
+    <div class="sec-lbl">新しい台の情報（省略可、デフォルト=0）</div>
+    <div class="inv-row">
+      <label>現在のG数</label>
+      <input type="number" inputmode="numeric" class="ifield" id="chgG" value="0" min="0" max="999">
+    </div>
+    <div class="inv-row" style="margin-bottom:14px">
+      <label>SC発生済み回数</label>
+      <input type="number" inputmode="numeric" class="ifield" id="chgSC" value="0" min="0">
+    </div>
+
+    <div class="g2">
+      <button class="btn cgray" onclick="closeModal('chgModal')">キャンセル</button>
+      <button class="btn cpri" onclick="execChangeMachine()">台変更を実行</button>
+    </div>
+  </div>
+</div>
+
+<!-- 数値入力モーダル -->
+<div class="overlay" id="kpOverlay" onclick="bgClose(event,'kpOverlay')">
+  <div class="modal">
+    <div class="modal-t" id="kpTitle">入力 <span class="modal-x" onclick="closeModal('kpOverlay')">✕</span></div>
+    <div class="kp-disp" id="kpDisp">0</div>
+    <div class="kp-grid">
+      <button class="kp" onclick="kp('7')">7</button><button class="kp" onclick="kp('8')">8</button><button class="kp" onclick="kp('9')">9</button>
+      <button class="kp" onclick="kp('4')">4</button><button class="kp" onclick="kp('5')">5</button><button class="kp" onclick="kp('6')">6</button>
+      <button class="kp" onclick="kp('1')">1</button><button class="kp" onclick="kp('2')">2</button><button class="kp" onclick="kp('3')">3</button>
+      <button class="kp kp-del" onclick="kpDel()">⌫</button>
+      <button class="kp kp-0" onclick="kp('0')">0</button>
+      <button class="kp kp-ok" onclick="kpOK()">確定</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════ */
+const CEIL_N = 999, CEIL_R = 599;
+const G50 = 31.8; // G per 50 coins
+
+function cpg(rate) { return (rate / 20) * (1000 / G50); } // 円/G
+
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let S = {
+  sessionId: '', date: '', machineNum: 1, rate: 20,
+  startTime: '',
+  mode: 'normal', g: 0, latG: 0, isReset: false,
+  sessionG: 0,   // 今日の総G（投資計算用）
+  scCount: 0, scHistory: [], sabaRen: 0, superSaba: 0,
+  triggers: {A:0,B:0,C:0,D:0},
+  highStats: {
+    high:    {entered:0, hit:0},   // SC高確
+    sp:      {entered:0, hit:0},   // SP高確
+    mystery: {entered:0, hit:0},   // 謎高確
+  },
+  medals: 0,
+  trigEvents: [],
+};
+
+const MODES = {
+  normal:  {lbl:'通常',  cls:'sn',   sub:'通常遊技中\n右1stペナルティ注意'},
+  high:    {lbl:'SC高確',cls:'sh',   sub:'全役でSC抽選中\n当選期待度 約50%'},
+  sp:      {lbl:'SP高確',cls:'ssp',  sub:'SC当選でサバ連濃厚！\n継続必須'},
+  mystery: {lbl:'謎高確',cls:'sm',   sub:'ゾーン外から高確移行\n継続推奨'},
+  at:      {lbl:'AT中',  cls:'sat',  sub:'サバンナチャンス消化中\nレア役でボーナス抽選'},
+  latent:  {lbl:'潜伏中',cls:'slat', sub:'即ヤメ厳禁！\n毎G全役でストック放出抽選'},
+  bonus:   {lbl:'ボーナス',cls:'sbon',sub:'ボーナス消化中'},
+};
+
+/* ═══════════════════════════════════
+   LOCALSTORAGE
+═══════════════════════════════════ */
+const STORE = {
+  KEY: 'juuou_sess_v3',
+  KCR: 'juuou_cur_v3',
+  all()  { try{return JSON.parse(localStorage.getItem(this.KEY))||[];}catch{return[];} },
+  save(a){ localStorage.setItem(this.KEY, JSON.stringify(a)); },
+  cur()  { try{return JSON.parse(localStorage.getItem(this.KCR));}catch{return null;} },
+  saveCur(s){ localStorage.setItem(this.KCR, JSON.stringify(s)); },
+  delCur(){ localStorage.removeItem(this.KCR); },
+};
+
+/* ═══════════════════════════════════
+   INIT
+═══════════════════════════════════ */
+window.addEventListener('load', () => {
+  const saved = STORE.cur();
+  if (saved && saved.date === todayStr()) {
+    S = {...S, ...saved};
+    // restore rate buttons
+    setRateUI(S.rate);
+    if (S.medals !== undefined) document.getElementById('medals').value = S.medals;
+    if (S.sessionG) document.getElementById('inputSessionG').value = S.sessionG;
+    if (S.scCount)  document.getElementById('inputSCCount').value  = S.scCount;
+  } else {
+    newSession();
+  }
+  renderAll();
+  setInterval(() => STORE.saveCur(S), 20000);
+});
+
+function newSession() {
+  const today = STORE.all().filter(s => s.date === todayStr());
+  S.sessionId = Date.now().toString();
+  S.date = todayStr();
+  S.machineNum = today.length + 1;
+  S.startTime = nowStr();
+  S.mode = 'normal'; S.g = 0; S.latG = 0; S.isReset = false;
+  S.sessionG = 0; S.scCount = 0; S.scHistory = []; S.sabaRen = 0; S.superSaba = 0;
+  S.triggers = {A:0,B:0,C:0,D:0}; S.trigEvents = [];
+  S.medals = 0;
+  STORE.saveCur(S);
+}
+
+/* ═══════════════════════════════════
+   RATE
+═══════════════════════════════════ */
+function setRate(r) {
+  S.rate = r;
+  setRateUI(r);
+  calcBal();
+  STORE.saveCur(S);
+}
+function setRateUI(r) {
+  [20,10,5].forEach(v => document.getElementById('rb'+v).classList.toggle('on', v===r));
+  const notes = {20:'20円/枚（1,000円=50枚）', 10:'10円/枚（1,000円=100枚）', 5:'5円/枚（1,000円=200枚）'};
+  document.getElementById('rateNote').textContent = notes[r] || r+'円/枚';
+}
+
+/* ═══════════════════════════════════
+   G COUNT
+═══════════════════════════════════ */
+function addG(n) { S.g = Math.max(0, Math.min(999, S.g + n)); renderAll(); }
+function setG(v) { S.g = Math.max(0, Math.min(999, v)); renderAll(); }
+
+/* ═══════════════════════════════════
+   LATENT
+═══════════════════════════════════ */
+function addLat(n) { S.latG = Math.max(0, Math.min(29, S.latG + n)); renderAll(); }
+function setLat(v) { S.latG = Math.max(0, Math.min(29, v)); renderAll(); }
+
+/* ═══════════════════════════════════
+   SC COUNTER
+═══════════════════════════════════ */
+function addSC(n) { S.scCount = Math.max(0, S.scCount + n); syncInputs(); renderAll(); }
+function setSC(v) { S.scCount = Math.max(0, v); syncInputs(); renderAll(); }
+
+function setSessionG(v) {
+  S.sessionG = Math.max(0, parseInt(v) || 0);
+  addLog('総G数セット: ' + S.sessionG + 'G');
+  STORE.saveCur(S);
+  renderAll();
+}
+
+function setSCDirect(v) {
+  S.scCount = Math.max(0, parseInt(v) || 0);
+  addLog('SC回数セット: ' + S.scCount + '回');
+  STORE.saveCur(S);
+  renderAll();
+}
+
+function syncInputs() {
+  const gEl = document.getElementById('inputSessionG');
+  const sEl = document.getElementById('inputSCCount');
+  if (gEl && document.activeElement !== gEl) gEl.value = S.sessionG || '';
+  if (sEl && document.activeElement !== sEl) sEl.value = S.scCount || '';
+}
+
+/* ═══════════════════════════════════
+   STATE TRANSITIONS
+═══════════════════════════════════ */
+function startAT() {
+  // 高確状態からのSC当選を記録
+  if (['high','sp','mystery'].includes(S.mode)) {
+    if (!S.highStats) S.highStats = {high:{entered:0,hit:0},sp:{entered:0,hit:0},mystery:{entered:0,hit:0}};
+    S.highStats[S.mode].hit++;
+    const names = {high:'SC高確',sp:'SP高確',mystery:'謎高確'};
+    addLog('🎯 ' + names[S.mode] + 'からSC当選！');
+  }
+  S.scHistory.push({g: S.g, time: nowStr(), fromState: S.mode});
+  S.sessionG += S.g;
+  S.scCount++;
+  addLog('AT開始(' + S.g + 'G) — ' + S.scCount + '連目 | 今日総G:' + S.sessionG);
+  S.g = 0; S.mode = 'at';
+  STORE.saveCur(S);
+  renderAll();
+}
+
+function endAT() {
+  addLog('AT終了 → 潜伏29G開始（即ヤメ厳禁）');
+  S.mode = 'latent'; S.latG = 0; renderAll();
+}
+
+function endLatent() {
+  addLog('潜伏終了(' + S.latG + 'G消化) → 通常 [SC高確期待]');
+  S.mode = 'normal'; if (S.g < 29) S.g = 29; S.latG = 0; renderAll();
+}
+
+function setMode(m) {
+  addLog(MODES[S.mode].lbl + ' → ' + MODES[m].lbl);
+  // 高確状態への突入を記録
+  if (['high','sp','mystery'].includes(m)) {
+    if (!S.highStats) S.highStats = {high:{entered:0,hit:0},sp:{entered:0,hit:0},mystery:{entered:0,hit:0}};
+    S.highStats[m].entered++;
+  }
+  S.mode = m; renderAll();
+}
+
+function doReset() {
+  S.g = 0; S.isReset = true; S.mode = 'normal';
+  addLog('設定変更後: 天井599Gに短縮'); renderAll();
+}
+
+/* ═══════════════════════════════════
+   TRIGGERS
+═══════════════════════════════════ */
+const TRIGS = {
+  A:{name:'キリンサバチャン', msg:'🦒 ループ率80% or 90%！サバ連継続！'},
+  B:{name:'サバチャンEX',     msg:'🔥 30回ナビループ継続！'},
+  C:{name:'100ナビフリーズ',  msg:'💥 ボーナス・ストック大量獲得！'},
+  D:{name:'REGボーナス',      msg:'👑 超サバストック濃厚！3000枚OVER期待！'},
+};
+
+function fireTrig(k) {
+  S.triggers[k] = (S.triggers[k]||0) + 1;
+  S.trigEvents.push({name:TRIGS[k].name, time:nowStr()});
+  document.getElementById('t'+k).classList.add('fired');
+  addLog('4大トリガー: ' + TRIGS[k].name + ' 発生！');
+  showToast(TRIGS[k].msg);
+  if (k==='D') { S.mode='bonus'; }
+  renderAll();
+  renderTrigLog();
+}
+
+function renderTrigLog() {
+  const el = document.getElementById('trigLog');
+  if (!S.trigEvents || !S.trigEvents.length) { el.textContent='未発生'; return; }
+  el.innerHTML = S.trigEvents.map(t=>`<span style="margin-right:8px"><span class="lt">${t.time}</span>${t.name}</span>`).join('');
+}
+
+/* ═══════════════════════════════════
+   STATS
+═══════════════════════════════════ */
+function statsOf(arr) {
+  if (!arr.length) return {count:0,totalG:0,scCount:0,avgHit:null,maxRen:0,bal:0};
+  const tG = arr.reduce((a,s)=>a+s.totalG,0);
+  const tS = arr.reduce((a,s)=>a+s.scCount,0);
+  return {
+    count: arr.length,
+    totalG: tG,
+    scCount: tS,
+    avgHit: tS>0 ? Math.round(tG/tS) : null,
+    maxRen: arr.reduce((a,s)=>Math.max(a,s.sabaRen||0),0),
+    bal: arr.reduce((a,s)=>a+(s.balanceYen||0),0),
+  };
+}
+
+function estimateSetting(avgHit, count) {
+  if (!avgHit || count < 2) return {lbl:'不明', color:'var(--mu)', note:'データ不足 ('+count+'回分)'};
+  if (avgHit <= 283) return {lbl:'設定6',    color:'#ffd700',    note:'1/'+avgHit+' ← 設定6: 1/279'};
+  if (avgHit <= 291) return {lbl:'設定5〜6', color:'var(--rd)',   note:'1/'+avgHit+' ← 設定5: 1/287'};
+  if (avgHit <= 305) return {lbl:'設定4以上',color:'var(--gn)',   note:'1/'+avgHit+' ← 設定4: 1/295'};
+  if (avgHit <= 322) return {lbl:'設定2〜4', color:'var(--ye)',   note:'1/'+avgHit+' ← 設定2: 1/321'};
+  return                     {lbl:'設定1〜2', color:'var(--mu)',   note:'1/'+avgHit+' ← 設定1: 1/326'};
+}
+
+/* ═══════════════════════════════════
+   MACHINE CHANGE
+═══════════════════════════════════ */
+function openChangeMachine() { document.getElementById('chgModal').classList.add('open'); }
+
+function execChangeMachine() {
+  const finalMedals = parseInt(document.getElementById('chgMedals').value)||0;
+  const nextG       = parseInt(document.getElementById('chgG').value)||0;
+  const nextSC      = parseInt(document.getElementById('chgSC').value)||0;
+
+  // Save current session
+  const invest  = Math.round(S.sessionG * cpg(S.rate));
+  const recover = Math.round(finalMedals * S.rate);
+  const all = STORE.all();
+  all.push({
+    id: S.sessionId, date: S.date, machineNum: S.machineNum, rate: S.rate,
+    startTime: S.startTime, endTime: nowStr(),
+    totalG: S.sessionG, finalG: S.g,
+    scCount: S.scCount, avgHit: S.scCount>0 ? Math.round(S.sessionG/S.scCount) : null,
+    sabaRen: S.sabaRen, superSaba: S.superSaba,
+    triggers: {...S.triggers},
+    highStats: JSON.parse(JSON.stringify(S.highStats||{})),
+    finalMedals, investYen: invest, balanceYen: recover - invest,
+  });
+  STORE.save(all);
+
+  // Start new session
+  newSession();
+  S.g = nextG; S.scCount = nextSC;
+  S.machineNum = all.filter(s=>s.date===todayStr()).length + 1;
+  document.getElementById('medals').value = 0;
+  document.getElementById('chgMedals').value = 0;
+  document.getElementById('chgG').value = 0;
+  document.getElementById('chgSC').value = 0;
+  closeModal('chgModal');
+  addLog('台変更 → 第'+S.machineNum+'台目 開始');
+  STORE.saveCur(S);
+  renderAll();
+  renderHistory();
+}
+
+/* ═══════════════════════════════════
+   BALANCE (AUTO)
+═══════════════════════════════════ */
+function calcBal() {
+  S.medals = parseInt(document.getElementById('medals').value)||0;
+  const inv  = Math.round(S.sessionG * cpg(S.rate));
+  const rec  = Math.round(S.medals * S.rate);
+  const bal  = rec - inv;
+  const diffM = S.medals - Math.round(S.sessionG / G50 * 50);
+
+  document.getElementById('autoInvest').textContent  = inv.toLocaleString() + '円';
+  document.getElementById('autoRecover').textContent = rec.toLocaleString() + '円';
+  document.getElementById('sessionGDisp').textContent = S.sessionG.toLocaleString() + 'G';
+
+  const amtEl = document.getElementById('balAmt');
+  const hdrEl = document.getElementById('hdrBal');
+  const txt = (bal>0?'+':'') + bal.toLocaleString() + '円';
+  const cls = bal>0?'pos':bal<0?'neg':'zero';
+  amtEl.textContent=txt; amtEl.className='amt '+cls;
+  hdrEl.textContent=txt; hdrEl.className='hdr-bal '+cls;
+  document.getElementById('balSub').textContent = '差枚数: '+(diffM>=0?'+':'')+diffM.toLocaleString()+'枚';
+  STORE.saveCur(S);
+}
+
+/* ═══════════════════════════════════
+   TOP STATUS CARD
+═══════════════════════════════════ */
+function renderTopStatus() {
+  const all = STORE.all();
+  const todaySaved = all.filter(s=>s.date===todayStr());
+
+  // 今日（保存済み + 現在セッション）
+  const tG  = todaySaved.reduce((a,s)=>a+s.totalG,0) + S.sessionG;
+  const tSC = todaySaved.reduce((a,s)=>a+s.scCount,0) + S.scCount;
+  const tAvg = tSC>0 ? Math.round(tG/tSC) : null;
+  const tRen = Math.max(todaySaved.reduce((a,s)=>Math.max(a,s.sabaRen||0),0), S.sabaRen);
+
+  // 通算（全保存済み + 現在セッション）
+  const aG  = all.reduce((a,s)=>a+s.totalG,0) + S.sessionG;
+  const aSC = all.reduce((a,s)=>a+s.scCount,0) + S.scCount;
+  const aAvg = aSC>0 ? Math.round(aG/aSC) : null;
+  const aRen = Math.max(all.reduce((a,s)=>Math.max(a,s.sabaRen||0),0), S.sabaRen);
+
+  document.getElementById('topDate').textContent = S.date;
+  document.getElementById('topMac').textContent = '第' + S.machineNum + '台目';
+
+  document.getElementById('s-tG').textContent   = tG.toLocaleString()+'G';
+  document.getElementById('s-tSC').textContent  = tSC+'回';
+  document.getElementById('s-tAvg').textContent = tAvg?'1/'+tAvg:'—';
+  document.getElementById('s-tRen').textContent = tRen>0?tRen+'連':'—';
+
+  document.getElementById('s-aG').textContent   = aG.toLocaleString()+'G';
+  document.getElementById('s-aSC').textContent  = aSC+'回';
+  document.getElementById('s-aAvg').textContent = aAvg?'1/'+aAvg:'—';
+  document.getElementById('s-aRen').textContent = aRen>0?aRen+'連':'—';
+  document.getElementById('s-aCount').textContent = (all.length+1)+'セッション蓄積';
+
+  // 推定設定（通算ベース）
+  const est = estimateSetting(aAvg, aSC);
+  const estEl = document.getElementById('topEst');
+  estEl.textContent = est.lbl; estEl.style.color = est.color;
+  document.getElementById('topEstNote').textContent = est.note;
+
+  // やめ時
+  document.getElementById('topQuit').innerHTML = buildQuitLine();
+}
+
+function buildQuitLine() {
+  const ceil = S.isReset ? CEIL_R : CEIL_N;
+  const rem = ceil - S.g;
+  switch(S.mode) {
+    case 'sp':     return '<span class="trd">⚑ SP高確中 — 100G継続必須</span>';
+    case 'at':     return '<span class="tye">🎰 AT消化中 — 終了後も潜伏29G必須</span>';
+    case 'high':   return '<span class="tgn">✅ SC高確 — SC当選まで継続</span>';
+    case 'mystery':return '<span class="tpu">💜 謎高確 — 継続推奨</span>';
+    case 'latent': return S.latG>=29
+      ? '<span class="tye">⚠️ 潜伏完了 — 100G+α推奨</span>'
+      : '<span class="trd">⛔ 潜伏'+S.latG+'/29G — ヤメ厳禁</span>';
+    default:
+      if (rem<=80) return '<span class="trd">💥 天井まで'+rem+'G — 必ず継続</span>';
+      if (S.scCount>0&&S.g<100) return '<span class="tye">⚠️ サバ連後 — 100G継続推奨</span>';
+      return '<span style="color:var(--mu)">次の'+Math.ceil((S.g+1)/100)*100+'Gゾーン確認後に判断</span>';
+  }
+}
+
+/* ═══════════════════════════════════
+   CONTINUE GUIDE
+═══════════════════════════════════ */
+function renderContGuide() {
+  // SC期待度
+  const g=S.g, ceil=S.isReset?CEIL_R:CEIL_N, rem=ceil-g;
+  let pct,lbl,note,color;
+  if(S.mode==='sp')     {pct=85;lbl='高(85%) サバ連濃厚';note='SC当選でサバ連ほぼ確定！';color='var(--rd)';}
+  else if(S.mode==='at'){pct=60;lbl='中〜高(AT消化中)';note='レア役でボーナス抽選・連続期待';color='var(--ye)';}
+  else if(S.mode==='high'){pct=50;lbl='中(50%) SC高確';note='約50%の確率でSC当選';color='var(--gn)';}
+  else if(S.mode==='mystery'){pct=40;lbl='中(謎高確)';note='設定6は設定1の2倍以上発生';color='var(--pu)';}
+  else if(S.mode==='latent'){pct=20;lbl='低〜中(潜伏中)';note='29G後にSC高確移行の可能性あり';color='#8b5cf6';}
+  else if(S.mode==='bonus'){pct=70;lbl='高(ボーナス後)';note='超サバ後: 4大トリガー発生率UP';color='var(--gn)';}
+  else if(rem<=15){pct=95;lbl='確定(天井ゾーン)';note='天井SC/BIG/REG確定！';color='var(--pu)';}
+  else if(rem<=80){pct=72;lbl='高(天井圏)';note='天井まで'+rem+'G';color='var(--rd)';}
+  else if(g>=200&&g%200===0){pct=45;lbl='中(偶数ゾーン)';note='SC高確移行の主要ポイント';color='var(--bl)';}
+  else if(g>=100&&g%100===0){pct=30;lbl='中(ゾーン)';note='SC高確抽選ポイント';color='var(--bl)';}
+  else if(g<100&&S.scCount>0){pct=35;lbl='中(サバ連後)';note='100G到達でSP高確移行 約50%';color='var(--bl)';}
+  else{pct=12;lbl='低(通常)';note='初当たり平均1/326G (設定1基準)';color='var(--mu)';}
+
+  document.getElementById('scExpBar').style.width=pct+'%';
+  document.getElementById('scExpBar').style.background=color;
+  const el=document.getElementById('scExpLbl'); el.textContent=lbl; el.style.color=color;
+  document.getElementById('scExpNote').textContent=note;
+
+  // 推奨継続ライン
+  const box=(label,remG,note2,must=false)=>{
+    const rt=remG<0?'—':remG===0?'完了':'あと '+remG+'G';
+    const ct=remG>0?'≈'+Math.round(remG*cpg(S.rate)/500)*500+'円':'';
+    return `<div class="cbox ${must?'must':''}"><div class="cb-l">${label}${must?' ⚑':''}</div><div class="cb-r" style="color:${must?'var(--rd)':'var(--tx)'}">${rt}</div><div class="cb-c">${ct}</div><div class="cb-n">${note2}</div></div>`;
+  };
+  let html='';
+  if(S.mode==='at'){html=box('AT消化中',-1,'ヤメ不可',true)+box('終了後:潜伏29G',-1,'即ヤメ厳禁',true);}
+  else if(S.mode==='latent'){const rl=29-S.latG;html=rl>0?box('潜伏完了まで',rl,'絶対ヤメない',true)+box('完了後100G',Math.max(0,100-g),'SC高確移行期待'):box('潜伏完了✓',0,'ヤメ判断OK')+box('推奨:100G+α',Math.max(0,100-g),'SP高確移行50%期待');}
+  else if(S.mode==='sp'){html=box('必須:100G',Math.max(0,100-g),'SP高確消化必須',true)+box('天井'+ceil+'G',rem,'SC/BIG/REG確定',rem<=300);}
+  else if(S.mode==='high'||S.mode==='mystery'||S.mode==='bonus'){html=box('SC当選まで',-1,'継続必須',true)+box('天井'+ceil+'G',rem,'SC/BIG/REG確定');}
+  else{
+    if(rem<=80){html=`<div class="cbox must" style="grid-column:span 2"><div class="cb-l">天井${ceil}G ⚑必須</div><div class="cb-r" style="color:var(--rd)">あと${rem}G</div><div class="cb-c">≈${Math.round(rem*cpg(S.rate)/500)*500}円</div><div class="cb-n">SC/BIG/REG確定</div></div>`;}
+    else{
+      const n100=Math.ceil((g+1)/100)*100, n200=Math.ceil((g+1)/200)*200;
+      if(g<100&&S.scCount>0){html=box('サバ連後100G',100-g,'SP高確移行50%',true)+box('偶数200G',200-g,'SC高確主要ポイント');}
+      else{const l2=n200!==n100?box(n200+'G偶数',n200-g,'偶数ゾーン（主要）'):box('天井'+ceil+'G',rem,'SC/BIG/REG確定',rem<=300);html=box(n100+'Gゾーン',n100-g,'SC高確チェック')+l2;}
+    }
+  }
+  document.getElementById('contLines').innerHTML=html;
+}
+
+/* ═══════════════════════════════════
+   ADVICE
+═══════════════════════════════════ */
+function buildAdvice() {
+  const g=S.g, ceil=S.isReset?CEIL_R:CEIL_N, rem=ceil-g;
+  const av=(t,title,body)=>{const c={red:'ared',yellow:'ayel',green:'agreen',blue:'ablue',purp:'apurp'}[t];return`<div class="adv ${c}"><div class="adv-t">${title}</div><div class="adv-b">${body}</div></div>`;};
+  switch(S.mode){
+    case 'at':     return av('green','🎰 AT消化中','消化中はレア役でボーナス抽選あり。<br>終了後は<strong>潜伏29G消化まで絶対にヤメない</strong>こと。');
+    case 'latent': return S.latG>=29?av('yellow','⚠️ 潜伏完了 → ヤメ判断','ストックなし確認後ヤメOK。<br>余裕があれば<strong>100G継続</strong>推奨。'):av('red','⛔ 潜伏中 '+S.latG+'/29G — 残り'+(29-S.latG)+'G','<strong>絶対にヤメないこと。</strong>毎G全役でストック放出抽選中。<br>レア役 → サバ連昇格チャンス。');
+    case 'sp':     return av('red','🔴 SP高確！継続必須','次のSC当選でサバ連濃厚！<br><strong>100G超まで絶対継続。</strong>');
+    case 'high':   return av('green','✅ SC高確中','全役でSC抽選中（期待度 約50%）。<br>チャンス目・チェリーに注目。');
+    case 'mystery':return av('purp','💜 謎高確中','ゾーン外から高確移行。設定6は2倍以上発生。<br><strong>継続強く推奨。</strong>');
+    case 'bonus':  return av('yellow','👑 ボーナス消化中','超サバ後は4大トリガー発生率UP。');
+    default:
+      if(rem<=15) return av('purp','💥 天井発動ゾーン！'+g+'G (残り'+rem+'G)','<strong>天井'+ceil+'G確実！</strong>恩恵: SC or BIG or REG');
+      if(rem<=80) return av('red','⚠️ 天井圏 '+g+'G (残り'+rem+'G)','天井まであと'+rem+'G。継続。');
+      if(g>=100&&g%200===0) return av('green','⚡ 偶数ゾーン！('+g+'G)','SC高確移行の主要ポイント。継続推奨。');
+      if(g>=100&&g%100===0) return av('blue','⚡ ゾーン到達！('+g+'G)','SC高確抽選ポイント。継続推奨。');
+      const tz=100-(g%100);
+      if(tz<=12&&g>0) return av('blue','🔔 ゾーン接近 '+g+'G（あと'+tz+'G）','SC高確抽選ポイント接近。');
+      return av('blue','📍 通常 '+g+'G ／ 天井まで'+rem+'G','<strong>右1stは絶対NG</strong>（ペナルティ）。<br>左 or 中押し1stで消化。');
+  }
+}
+
+/* ═══════════════════════════════════
+   CEILING BAR
+═══════════════════════════════════ */
+function renderCeil() {
+  const ceil=S.isReset?CEIL_R:CEIL_N, g=S.g, rem=ceil-g;
+  const pct=Math.min(100,g/ceil*100);
+  const bar=document.getElementById('ceilBar');
+  bar.style.width=pct+'%';
+  bar.className='bar-fill '+(pct<60?'bfar':pct<85?'bmid':'bnear');
+  document.getElementById('barLbl').textContent='天井 '+ceil+'G';
+  const tag=document.getElementById('ceilTag');
+  if(rem<=15){tag.className='ctag ctzone';tag.textContent='天井発動ゾーン！残り'+rem+'G';}
+  else if(rem<=80){tag.className='ctag ctnear';tag.textContent='天井まで '+rem+'G';}
+  else if(rem<=250){tag.className='ctag ctmid';tag.textContent='天井まで '+rem+'G';}
+  else{tag.className='ctag ctfar';tag.textContent='天井まで '+rem+'G';}
+  const gEl=document.getElementById('gDisp');
+  gEl.textContent=g;
+  gEl.style.color=rem<=15?'var(--rd)':rem<=80?'var(--ye)':'var(--bl)';
+}
+
+/* ═══════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════ */
+function renderAll() {
+  const m=MODES[S.mode]||MODES.normal;
+  const lbl=document.getElementById('stateLbl');
+  lbl.textContent=m.lbl; lbl.className='state-lbl '+m.cls;
+  document.getElementById('stateSub').textContent=
+    S.mode==='latent'?'潜伏 '+S.latG+'/29G — 即ヤメ厳禁！':m.sub;
+
+  document.getElementById('scNum').textContent=S.scCount;
+  document.getElementById('scLabel').textContent=S.scCount===0?'—':S.scCount===1?'単発':S.scCount+'連目';
+  document.getElementById('latDisp').textContent=S.latG;
+  document.getElementById('latBar').style.width=Math.min(100,S.latG/29*100)+'%';
+
+  renderCeil();
+  renderContGuide();
+  document.getElementById('advBox').innerHTML=buildAdvice();
+  renderTopStatus();
+  renderHighStats();
+  syncInputs();
+  calcBal();
+  renderTrigLog();
+}
+
+/* ═══════════════════════════════════
+   HIGH STATS
+═══════════════════════════════════ */
+// 高確状態ごとの期待突入率と表示設定
+const HIGH_DEF = {
+  high:    { name:'SC高確',  exp:50, color:'var(--gn)', desc:'全役でSC抽選（理論値 約50%）' },
+  sp:      { name:'SP高確',  exp:85, color:'var(--rd)', desc:'SC当選でサバ連濃厚（理論値 約85%）' },
+  mystery: { name:'謎高確',  exp:40, color:'var(--pu)', desc:'設定6は設定1の2倍以上（理論値 約40%）' },
+};
+
+function renderHighStats() {
+  const hs = S.highStats || {high:{entered:0,hit:0},sp:{entered:0,hit:0},mystery:{entered:0,hit:0}};
+  const rowsEl = document.getElementById('highStatRows');
+  const judgeEl = document.getElementById('highStatJudge');
+
+  // 通算データを合算（保存済みセッション + 現在）
+  const all = STORE.all();
+  const merged = {high:{entered:0,hit:0},sp:{entered:0,hit:0},mystery:{entered:0,hit:0}};
+  all.forEach(s => {
+    if (!s.highStats) return;
+    ['high','sp','mystery'].forEach(k => {
+      merged[k].entered += (s.highStats[k]?.entered||0);
+      merged[k].hit     += (s.highStats[k]?.hit||0);
+    });
+  });
+  // Add current session
+  ['high','sp','mystery'].forEach(k => {
+    merged[k].entered += (hs[k]?.entered||0);
+    merged[k].hit     += (hs[k]?.hit||0);
+  });
+
+  // Build row HTML
+  let html = '';
+  ['high','sp','mystery'].forEach(k => {
+    const d = HIGH_DEF[k];
+    const cur = hs[k] || {entered:0,hit:0};
+    const tot = merged[k];
+    const curPct = cur.entered > 0 ? Math.round(cur.hit/cur.entered*100) : null;
+    const totPct = tot.entered > 0 ? Math.round(tot.hit/tot.entered*100) : null;
+
+    // Bar fill color
+    function barColor(pct, exp) {
+      if (pct === null) return 'var(--bd)';
+      const ratio = pct / exp;
+      if (ratio >= 0.9) return 'var(--gn)';
+      if (ratio >= 0.6) return 'var(--ye)';
+      return 'var(--rd)';
+    }
+
+    // Diff text
+    function diffTxt(pct, exp) {
+      if (pct === null) return '<span style="color:var(--mu)">データなし</span>';
+      const d2 = pct - exp;
+      const cls = d2 >= 0 ? 'tgn' : d2 >= -15 ? 'tye' : 'trd';
+      const sign = d2 >= 0 ? '+' : '';
+      return `<span class="${cls}">${pct}% (${sign}${d2}%)</span>`;
+    }
+
+    const bcCur = barColor(curPct, d.exp);
+    const bcTot = barColor(totPct, d.exp);
+    const curW  = curPct !== null ? Math.min(100, curPct) : 0;
+    const totW  = totPct !== null ? Math.min(100, totPct) : 0;
+
+    html += `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <span style="font-size:13px;font-weight:700;color:${d.color}">${d.name}</span>
+        <span style="font-size:11px;color:var(--mu)">期待値 ${d.exp}%</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <!-- 今セッション -->
+        <div>
+          <div style="font-size:10px;color:var(--mu);margin-bottom:3px">今セッション</div>
+          <div style="font-size:11px;margin-bottom:3px">突入:${cur.entered}回 → 当選:${cur.hit}回</div>
+          <div class="bar-bg" style="height:8px;margin-bottom:3px">
+            <div style="height:100%;border-radius:3px;width:${curW}%;background:${bcCur};transition:width .4s,background .4s"></div>
+          </div>
+          <div style="font-size:12px">${diffTxt(curPct, d.exp)}</div>
+        </div>
+        <!-- 通算 -->
+        <div>
+          <div style="font-size:10px;color:var(--mu);margin-bottom:3px">通算（全セッション）</div>
+          <div style="font-size:11px;margin-bottom:3px">突入:${tot.entered}回 → 当選:${tot.hit}回</div>
+          <div class="bar-bg" style="height:8px;margin-bottom:3px">
+            <div style="height:100%;border-radius:3px;width:${totW}%;background:${bcTot};transition:width .4s,background .4s"></div>
+          </div>
+          <div style="font-size:12px">${diffTxt(totPct, d.exp)}</div>
+        </div>
+      </div>
+
+      <div style="font-size:10px;color:var(--mu);margin-top:3px">${d.desc}</div>
+    </div>`;
+  });
+  rowsEl.innerHTML = html;
+
+  // 総合判定
+  judgeEl.innerHTML = buildHighJudge(merged);
+}
+
+function buildHighJudge(m) {
+  const h  = m.high,    hp  = h.entered  > 0 ? Math.round(h.hit/h.entered*100)   : null;
+  const sp = m.sp,      spp = sp.entered > 0 ? Math.round(sp.hit/sp.entered*100)  : null;
+  const my = m.mystery, myp = my.entered > 0 ? Math.round(my.hit/my.entered*100)  : null;
+
+  const hasData = (h.entered + sp.entered + my.entered) > 0;
+  if (!hasData) return '<span style="color:var(--mu)">高確状態への突入後にデータが蓄積されます</span>';
+
+  const lines = [];
+
+  // SC高確判定
+  if (hp !== null) {
+    if (hp >= 55)       lines.push('<span class="tgn">✅ SC高確 ' + hp + '% — 期待値超。高設定の可能性あり</span>');
+    else if (hp >= 40)  lines.push('<span class="tye">△ SC高確 ' + hp + '% — ほぼ期待値。継続観察</span>');
+    else if (hp >= 25)  lines.push('<span class="trd">⚠️ SC高確 ' + hp + '% — やや低い。低設定の疑い</span>');
+    else                lines.push('<span class="trd">❌ SC高確 ' + hp + '% — 大幅に低い。台の変更を検討</span>');
+  }
+
+  // SP高確判定
+  if (spp !== null) {
+    if (spp >= 75)      lines.push('<span class="tgn">✅ SP高確 ' + spp + '% — サバ連率良好</span>');
+    else if (spp >= 55) lines.push('<span class="tye">△ SP高確 ' + spp + '% — やや低め。観察継続</span>');
+    else                lines.push('<span class="trd">⚠️ SP高確 ' + spp + '% — サバ連失敗が多い。低設定の疑い</span>');
+  }
+
+  // 謎高確判定
+  if (myp !== null) {
+    if (myp >= 45)      lines.push('<span class="tgn">✅ 謎高確 ' + myp + '% — 発生率良好（高設定示唆）</span>');
+    else if (myp >= 25) lines.push('<span class="tye">△ 謎高確 ' + myp + '%</span>');
+    else                lines.push('<span class="trd">⚠️ 謎高確 ' + myp + '% — 低い（低設定の可能性）</span>');
+  }
+
+  // 総合コメント
+  const scoreArr = [hp !== null ? hp/50 : null, spp !== null ? spp/85 : null, myp !== null ? myp/40 : null].filter(x => x !== null);
+  if (scoreArr.length > 0) {
+    const avg = scoreArr.reduce((a,b) => a+b, 0) / scoreArr.length;
+    if (avg >= 1.0)      lines.push('<span class="tgn bold">→ 総合: 期待値以上。高設定の可能性あり</span>');
+    else if (avg >= 0.7) lines.push('<span class="tye bold">→ 総合: ほぼ期待値。設定2〜4の範囲か</span>');
+    else                 lines.push('<span class="trd bold">→ 総合: 期待値を下回る。低設定の可能性。台変更を検討</span>');
+  }
+
+  return lines.join('<br>');
+}
+
+/* ═══════════════════════════════════
+   HISTORY
+═══════════════════════════════════ */
+function toggleHistory() {
+  const w=document.getElementById('histWrap');
+  w.style.display=w.style.display==='none'?'block':'none';
+  if(w.style.display==='block') renderHistory();
+}
+
+function renderHistory() {
+  const all=STORE.all();
+  const el=document.getElementById('histList');
+  if(!all.length){el.innerHTML='<div style="color:var(--mu);font-size:13px;padding:8px 0">記録なし</div>';return;}
+  el.innerHTML=[...all].reverse().map(s=>{
+    const bal=s.balanceYen||0;
+    const cls=bal>0?'tgn':bal<0?'trd':'zero';
+    return `<div class="hist-item">
+      <div class="hist-left">${s.date} 第${s.machineNum}台目<br>総G:${(s.totalG||0).toLocaleString()} SC:${s.scCount||0}回 (1/${s.avgHit||'?'})</div>
+      <div class="hist-right ${cls}">${(bal>0?'+':'')+bal.toLocaleString()}円<br><span style="font-size:10px;color:var(--mu)">${s.startTime}〜${s.endTime}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function clearAllData() {
+  if(!confirm('全データを削除しますか？\n（この操作は取り消せません）')) return;
+  localStorage.removeItem(STORE.KEY);
+  STORE.delCur();
+  newSession();
+  renderAll();
+  renderHistory();
+  addLog('全データ削除');
+}
+
+/* ═══════════════════════════════════
+   LOG
+═══════════════════════════════════ */
+function addLog(msg) {
+  const el=document.getElementById('log');
+  const d=document.createElement('div'); d.className='li';
+  d.innerHTML=`<span class="lt">${nowStr()}</span>${msg}`;
+  el.insertBefore(d,el.firstChild);
+  while(el.children.length>50) el.removeChild(el.lastChild);
+}
+function clearLog() { document.getElementById('log').innerHTML='<div class="li"><span class="lt">--:--</span>クリア</div>'; }
+
+/* ═══════════════════════════════════
+   NUMPAD
+═══════════════════════════════════ */
+let kpT='g', kpV='';
+const KP_TITLES={g:'G数を入力',sc:'SC連続回数',lat:'潜伏G数',sg:'今日総G数（修正）'};
+const KP_MAX   ={g:999,sc:99,lat:29,sg:9999};
+
+function openKP(t) {
+  kpT=t; kpV='';
+  document.getElementById('kpTitle').innerHTML=(KP_TITLES[t]||'入力')+' <span class="modal-x" onclick="closeModal(\'kpOverlay\')">✕</span>';
+  document.getElementById('kpDisp').textContent='0';
+  document.getElementById('kpOverlay').classList.add('open');
+}
+function kp(d){ if(kpV.length>=5)return; kpV+=d; document.getElementById('kpDisp').textContent=parseInt(kpV)||'0'; }
+function kpDel(){ kpV=kpV.slice(0,-1); document.getElementById('kpDisp').textContent=kpV?(parseInt(kpV)||'0'):'0'; }
+function kpOK(){
+  const v=Math.min(parseInt(kpV)||0,KP_MAX[kpT]||9999);
+  if(kpT==='g'){addLog('G数セット: '+v+'G'); setG(v);}
+  else if(kpT==='sc'){setSC(v);}
+  else if(kpT==='lat'){addLog('潜伏G入力: '+v+'G'); setLat(v);}
+  else if(kpT==='sg'){S.sessionG=Math.max(0,v); addLog('今日総G修正: '+v+'G'); renderAll();}
+  closeModal('kpOverlay');
+}
+
+/* ═══════════════════════════════════
+   MODAL / TOAST / UTIL
+═══════════════════════════════════ */
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function bgClose(e,id){ if(e.target.id===id) closeModal(id); }
+
+let _tt=null;
+function showToast(msg){
+  const el=document.getElementById('toast'); el.innerHTML=msg; el.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+function todayStr(){ return new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'); }
+function nowStr(){ return new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
+</script>
+</body>
+</html>
