@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>収支レポート | L獣王XZ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--card:#161b22;--c2:#1c2128;--bd:#30363d;--tx:#f0f6fc;--mu:#7d8590;--ye:#f0a83a;--gn:#3fb950;--rd:#f85149;--bl:#58a6ff;--pu:#bc8cff}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica Neue',sans-serif;max-width:480px;margin:0 auto;font-size:14px}
+
+.hdr{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;gap:12px}
+.back{color:var(--bl);text-decoration:none;font-size:15px;font-weight:700;white-space:nowrap}
+.hdr-title{font-size:15px;font-weight:700;color:var(--ye);flex:1}
+
+.page{padding:10px 10px 32px}
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
+.ch{font-size:10px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* RATE SELECTOR */
+.rate-sel{display:flex;gap:4px}
+.rb{padding:6px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--c2);color:var(--mu);font-size:13px;font-weight:700;cursor:pointer}
+.rb.on{background:var(--ye);color:#000;border-color:var(--ye)}
+
+/* SUMMARY GRID */
+.sg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.sbox{background:var(--c2);border-radius:8px;padding:10px;text-align:center}
+.sbox .lbl{font-size:10px;color:var(--mu);margin-bottom:4px}
+.sbox .val{font-size:22px;font-weight:800;line-height:1}
+.sbox .sub{font-size:10px;color:var(--mu);margin-top:3px}
+
+/* BIG BALANCE */
+.bal-big{text-align:center;padding:14px 0}
+.bal-big .lbl2{font-size:11px;color:var(--mu);margin-bottom:6px}
+.bal-big .amt{font-size:46px;font-weight:900;line-height:1}
+.bal-big .sub2{font-size:12px;color:var(--mu);margin-top:6px}
+.pos{color:var(--gn)} .neg{color:var(--rd)} .zero{color:var(--mu)}
+
+/* INPUT */
+.inv-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.inv-row label{flex:1;font-size:13px;color:var(--mu)}
+.ifield{background:var(--c2);border:1px solid var(--bd);color:#fff;border-radius:6px;padding:8px 10px;font-size:16px;width:110px;text-align:right;-webkit-appearance:none}
+.ifield::-webkit-inner-spin-button,.ifield::-webkit-outer-spin-button{-webkit-appearance:none}
+.big-inp{width:100%;background:var(--c2);border:2px solid var(--bd);border-radius:10px;color:var(--tx);font-size:30px;font-weight:900;padding:10px;text-align:center;-webkit-appearance:none;outline:none}
+.big-inp:focus{border-color:var(--bl)}
+
+/* CHART WRAPPER */
+.chart-wrap{position:relative;height:220px;margin-bottom:4px}
+.chart-empty{text-align:center;padding:40px 0;color:var(--mu);font-size:13px}
+
+/* TABLE */
+.dtable{width:100%;border-collapse:collapse;font-size:12px}
+.dtable th{background:var(--c2);color:var(--mu);padding:7px 8px;font-size:10px;text-align:center}
+.dtable td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:center}
+.dtable td:first-child{text-align:left}
+.dtable tr:last-child td{border-bottom:none}
+
+/* DIVIDER */
+hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
+.auto-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.auto-row:last-child{border-bottom:none}
+.auto-row .ll{color:var(--mu)}
+.trd{color:var(--rd)} .tgn{color:var(--gn)} .tye{color:var(--ye)} .tbl{color:var(--bl)} .bold{font-weight:700}
+
+/* BADGE */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-gn{background:#0f2818;color:var(--gn)}
+.badge-rd{background:#2d0f0f;color:var(--rd)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="index.html" class="back">← 戻る</a>
+  <div class="hdr-title">📊 収支レポート</div>
+</div>
+
+<div class="page">
+
+<!-- ① 現在のセッション -->
+<div class="card">
+  <div class="ch">現在のセッション（未保存）</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:12px;color:var(--mu)">レート</span>
+    <div class="rate-sel">
+      <button class="rb" id="rb20" onclick="setRate(20,this)">20円</button>
+      <button class="rb" id="rb10" onclick="setRate(10,this)">10円</button>
+      <button class="rb" id="rb5"  onclick="setRate(5,this)">5円</button>
+    </div>
+  </div>
+
+  <div class="sg2">
+    <div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:5px">今日の総G数</div>
+      <input type="number" inputmode="numeric" class="big-inp" id="curG" placeholder="0" min="0" onchange="calcCur()" onfocus="this.select()">
+      <div style="font-size:10px;color:var(--mu);margin-top:3px;text-align:center">メインから自動連携</div>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:5px">現在の持ち枚数</div>
+      <input type="number" inputmode="numeric" class="big-inp" id="curMedals" placeholder="0" min="0" onchange="calcCur()" onfocus="this.select()">
+    </div>
+  </div>
+
+  <hr class="dv">
+  <div class="auto-row"><span class="ll">投資額（自動）</span><span id="curInvest" class="bold">0円</span></div>
+  <div class="auto-row"><span class="ll">獲得額（自動）</span><span id="curRecover" class="bold">0円</span></div>
+  <div class="bal-big">
+    <div class="lbl2">現在の収支</div>
+    <div class="amt zero" id="curBal">±0円</div>
+    <div class="sub2" id="curSub">差枚数: 0枚</div>
+  </div>
+</div>
+
+<!-- ② 今日のサマリー -->
+<div class="card" id="todayCard">
+  <div class="ch">今日の合計</div>
+  <div class="sg3" id="todaySummary">
+    <div class="sbox"><div class="lbl">台数</div><div class="val" id="tMachines">0</div></div>
+    <div class="sbox"><div class="lbl">投資</div><div class="val trd" id="tInvest">0</div><div class="sub">円</div></div>
+    <div class="sbox"><div class="lbl">収支</div><div class="val zero" id="tBal">±0</div><div class="sub">円</div></div>
+  </div>
+</div>
+
+<!-- ③ 通算サマリー -->
+<div class="card">
+  <div class="ch">通算</div>
+  <div class="sg3">
+    <div class="sbox"><div class="lbl">セッション数</div><div class="val tbl" id="aSessions">0</div></div>
+    <div class="sbox"><div class="lbl">総投資</div><div class="val trd" id="aInvest">0</div><div class="sub">円</div></div>
+    <div class="sbox"><div class="lbl">通算収支</div><div class="val zero" id="aBal">±0</div><div class="sub">円</div></div>
+  </div>
+</div>
+
+<!-- ④ 台変更ごとの収支グラフ -->
+<div class="card">
+  <div class="ch">台変更ごとの収支</div>
+  <div class="chart-wrap">
+    <canvas id="sessionChart"></canvas>
+    <div class="chart-empty" id="sessionEmpty" style="display:none">台変更データがありません</div>
+  </div>
+  <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:4px">
+    棒: 各台の収支 ／ 折れ線: 累計収支
+  </div>
+</div>
+
+<!-- ⑤ 1日ごとの収支グラフ -->
+<div class="card">
+  <div class="ch">1日ごとの収支</div>
+  <div class="chart-wrap">
+    <canvas id="dailyChart"></canvas>
+    <div class="chart-empty" id="dailyEmpty" style="display:none">日別データがありません</div>
+  </div>
+  <div style="font-size:10px;color:var(--mu);text-align:center;margin-top:4px">
+    棒: 1日の収支合計 ／ 折れ線: 累計収支
+  </div>
+</div>
+
+<!-- ⑥ セッション詳細一覧 -->
+<div class="card">
+  <div class="ch">セッション詳細</div>
+  <div style="overflow-x:auto">
+    <table class="dtable" id="sessTable">
+      <thead>
+        <tr>
+          <th>日付・台</th><th>総G</th><th>SC</th><th>初当</th><th>収支</th>
+        </tr>
+      </thead>
+      <tbody id="sessBody">
+        <tr><td colspan="5" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+/* ─────────────────────────
+   CONSTANTS & STORAGE
+───────────────────────── */
+const G50 = 31.8;
+function cpg(r) { return (r/20) * (1000/G50); }
+
+const STORE = {
+  all()  { try{return JSON.parse(localStorage.getItem('juuou_sess_v3'))||[];}catch{return[];} },
+  cur()  { try{return JSON.parse(localStorage.getItem('juuou_cur_v3'));}catch{return null;} },
+};
+
+let currentRate = 20;
+
+/* ─────────────────────────
+   INIT
+───────────────────────── */
+window.addEventListener('load', () => {
+  // 現在セッションからレートとG数を読み込む
+  const cur = STORE.cur();
+  if (cur) {
+    currentRate = cur.rate || 20;
+    const gEl = document.getElementById('curG');
+    if (cur.sessionG) gEl.value = cur.sessionG;
+  }
+  setRateUI(currentRate);
+  calcCur();
+  renderSummary();
+  buildSessionChart();
+  buildDailyChart();
+  buildSessionTable();
+});
+
+/* ─────────────────────────
+   RATE
+───────────────────────── */
+function setRate(r, btn) {
+  currentRate = r;
+  setRateUI(r);
+  // 現在セッションのレートも更新
+  const cur = STORE.cur();
+  if (cur) { cur.rate = r; localStorage.setItem('juuou_cur_v3', JSON.stringify(cur)); }
+  calcCur();
+}
+function setRateUI(r) {
+  [20,10,5].forEach(v => document.getElementById('rb'+v).classList.toggle('on', v===r));
+}
+
+/* ─────────────────────────
+   CURRENT SESSION CALC
+───────────────────────── */
+function calcCur() {
+  const g      = parseInt(document.getElementById('curG').value)||0;
+  const medals = parseInt(document.getElementById('curMedals').value)||0;
+  const inv    = Math.round(g * cpg(currentRate));
+  const rec    = Math.round(medals * currentRate);
+  const bal    = rec - inv;
+  const diffM  = medals - Math.round(g / G50 * 50);
+
+  document.getElementById('curInvest').textContent  = inv.toLocaleString() + '円';
+  document.getElementById('curRecover').textContent = rec.toLocaleString() + '円';
+  document.getElementById('curSub').textContent     = '差枚数: ' + (diffM>=0?'+':'') + diffM.toLocaleString() + '枚';
+
+  const el  = document.getElementById('curBal');
+  const txt = (bal>0?'+':'') + bal.toLocaleString() + '円';
+  el.textContent = txt;
+  el.className   = 'amt ' + (bal>0?'pos':bal<0?'neg':'zero');
+
+  renderSummary();
+}
+
+/* ─────────────────────────
+   SUMMARIES
+───────────────────────── */
+function renderSummary() {
+  const sessions = STORE.all();
+  const today    = todayStr();
+
+  // 今日（保存済み）
+  const todaySess = sessions.filter(s => s.date === today);
+  const tInvest   = todaySess.reduce((a,s) => a+(s.investYen||0), 0);
+  const tBal      = todaySess.reduce((a,s) => a+(s.balanceYen||0), 0);
+
+  // 今日（現在セッション加算）
+  const curG   = parseInt(document.getElementById('curG').value)||0;
+  const curM   = parseInt(document.getElementById('curMedals').value)||0;
+  const curInv = Math.round(curG * cpg(currentRate));
+  const curRec = Math.round(curM * currentRate);
+  const curBal = curRec - curInv;
+
+  const tInvestAll = tInvest + curInv;
+  const tBalAll    = tBal    + curBal;
+
+  document.getElementById('tMachines').textContent = (todaySess.length + 1) + '台';
+  document.getElementById('tInvest').textContent   = tInvestAll.toLocaleString();
+  const tBalEl = document.getElementById('tBal');
+  tBalEl.textContent = (tBalAll>=0?'+':'') + tBalAll.toLocaleString();
+  tBalEl.className   = 'val ' + (tBalAll>0?'tgn':tBalAll<0?'trd':'zero');
+
+  // 通算（保存済みのみ）
+  const aInvest = sessions.reduce((a,s) => a+(s.investYen||0), 0);
+  const aBal    = sessions.reduce((a,s) => a+(s.balanceYen||0), 0);
+  document.getElementById('aSessions').textContent = sessions.length + '回';
+  document.getElementById('aInvest').textContent   = aInvest.toLocaleString();
+  const aBalEl = document.getElementById('aBal');
+  aBalEl.textContent = (aBal>=0?'+':'') + aBal.toLocaleString();
+  aBalEl.className   = 'val ' + (aBal>0?'tgn':aBal<0?'trd':'zero');
+}
+
+/* ─────────────────────────
+   CHART HELPERS
+───────────────────────── */
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 400 },
+  plugins: {
+    legend: { labels: { color: '#7d8590', font: { size: 11 }, boxWidth: 12 } },
+    tooltip: {
+      backgroundColor: '#161b22',
+      borderColor: '#30363d',
+      borderWidth: 1,
+      titleColor: '#f0f6fc',
+      bodyColor: '#7d8590',
+      callbacks: {
+        label: ctx => ' ' + (ctx.parsed.y >= 0 ? '+' : '') + ctx.parsed.y.toLocaleString() + '円'
+      }
+    }
+  },
+  scales: {
+    x: {
+      ticks: { color: '#7d8590', font: { size: 10 }, maxRotation: 40, minRotation: 0 },
+      grid: { color: '#21262d' }
+    },
+    y: {
+      ticks: {
+        color: '#7d8590', font: { size: 10 },
+        callback: v => (v >= 0 ? '+' : '') + (Math.abs(v)>=1000 ? (v/1000).toFixed(1)+'k' : v) + '円'
+      },
+      grid: { color: '#21262d' }
+    }
+  }
+};
+
+function makeCumulativeData(arr) {
+  let running = 0;
+  return arr.map(v => { running += v; return running; });
+}
+
+function buildMixedChart(canvasId, emptyId, labels, perData, cumData) {
+  const canvas = document.getElementById(canvasId);
+  const empty  = document.getElementById(emptyId);
+
+  if (!labels.length) {
+    canvas.style.display = 'none';
+    empty.style.display  = 'block';
+    return;
+  }
+
+  new Chart(canvas, {
+    data: {
+      labels,
+      datasets: [
+        {
+          type: 'bar',
+          label: '収支',
+          data: perData,
+          backgroundColor: perData.map(v => v >= 0 ? 'rgba(63,185,80,.55)' : 'rgba(248,81,73,.55)'),
+          borderColor:     perData.map(v => v >= 0 ? '#3fb950' : '#f85149'),
+          borderWidth: 1,
+          borderRadius: 3,
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: '累計',
+          data: cumData,
+          borderColor: '#58a6ff',
+          backgroundColor: 'rgba(88,166,255,.08)',
+          fill: true,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: '#58a6ff',
+          pointBorderColor: '#0d1117',
+          pointBorderWidth: 1,
+          borderWidth: 2,
+          order: 1,
+        }
+      ]
+    },
+    options: CHART_DEFAULTS,
+  });
+}
+
+/* ─────────────────────────
+   SESSION CHART
+───────────────────────── */
+function buildSessionChart() {
+  const sessions = STORE.all();
+  const labels   = sessions.map(s => {
+    const d = s.date ? s.date.slice(5).replace('-','/') : '—';
+    return `${d} 第${s.machineNum||'?'}台`;
+  });
+  const perData  = sessions.map(s => s.balanceYen || 0);
+  const cumData  = makeCumulativeData(perData);
+  buildMixedChart('sessionChart', 'sessionEmpty', labels, perData, cumData);
+}
+
+/* ─────────────────────────
+   DAILY CHART
+───────────────────────── */
+function buildDailyChart() {
+  const sessions = STORE.all();
+  const byDate   = {};
+  sessions.forEach(s => {
+    if (!byDate[s.date]) byDate[s.date] = 0;
+    byDate[s.date] += (s.balanceYen || 0);
+  });
+
+  const dates   = Object.keys(byDate).sort();
+  const labels  = dates.map(d => d.slice(5).replace('-','/'));
+  const perData = dates.map(d => byDate[d]);
+  const cumData = makeCumulativeData(perData);
+  buildMixedChart('dailyChart', 'dailyEmpty', labels, perData, cumData);
+}
+
+/* ─────────────────────────
+   SESSION TABLE
+───────────────────────── */
+function buildSessionTable() {
+  const sessions = STORE.all();
+  const tbody = document.getElementById('sessBody');
+  if (!sessions.length) return;
+
+  tbody.innerHTML = [...sessions].reverse().map(s => {
+    const bal = s.balanceYen || 0;
+    const cls = bal > 0 ? 'tgn' : bal < 0 ? 'trd' : '';
+    const avg = s.avgHit ? '1/' + s.avgHit : '—';
+    const d   = s.date ? s.date.slice(5).replace('-','/') : '—';
+    return `<tr>
+      <td>${d} 第${s.machineNum||'?'}台<br><span style="font-size:10px;color:var(--mu)">${s.startTime||''}〜${s.endTime||''}</span></td>
+      <td>${(s.totalG||0).toLocaleString()}G</td>
+      <td>${s.scCount||0}回</td>
+      <td>${avg}</td>
+      <td class="${cls} bold">${(bal>=0?'+':'')+bal.toLocaleString()}円</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ─────────────────────────
+   UTIL
+───────────────────────── */
+function todayStr() {
+  return new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+}
+</script>
+</body>
+</html>
