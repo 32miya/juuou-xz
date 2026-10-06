@@ -340,7 +340,31 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <button class="btn cgreen btn-lg" onclick="startAT()">🎰 AT開始</button>
     <button class="btn cyel btn-lg" onclick="endAT()">✅ AT終了→潜伏</button>
   </div>
-  <div class="g3">
+
+  <!-- SC色ピッカー (AT開始後に表示) -->
+  <div id="scColorPrompt" style="display:none;margin-top:10px;padding:12px;background:rgba(88,166,255,.08);border:1px solid var(--bl);border-radius:10px">
+    <div style="font-size:12px;color:var(--bl);font-weight:700;text-align:center;margin-bottom:8px">🎰 このSCの色（突入時タイトル）は？</div>
+    <div class="g3">
+      <button class="btn cred" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px" onclick="recordSCColor('chance')">
+        <span style="font-size:20px">🔴</span>
+        <span style="font-size:12px;font-weight:700">赤</span>
+        <span style="font-size:10px;opacity:.8">チャンス</span>
+      </button>
+      <button class="btn cblue" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px;border:2px solid var(--bl)" onclick="recordSCColor('heaven')">
+        <span style="font-size:20px">🔵</span>
+        <span style="font-size:12px;font-weight:700">青</span>
+        <span style="font-size:10px;opacity:.8">天国濃厚!</span>
+      </button>
+      <button class="btn cyel" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px" onclick="recordSCColor('superHeaven')">
+        <span style="font-size:20px">🏅</span>
+        <span style="font-size:12px;font-weight:700">金</span>
+        <span style="font-size:10px;opacity:.8">超天国確定</span>
+      </button>
+    </div>
+    <button class="btn cgray btn-xs" style="width:100%;margin-top:8px" onclick="document.getElementById('scColorPrompt').style.display='none'">スキップ（不明）</button>
+  </div>
+
+  <div class="g3" style="margin-top:8px">
     <button class="btn cblue btn-sm" onclick="setMode('high')">SC高確</button>
     <button class="btn cred btn-sm" onclick="setMode('sp')">SP高確</button>
     <button class="btn cpurp btn-sm" onclick="setMode('mystery')">謎高確</button>
@@ -350,6 +374,12 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <button class="btn corange btn-sm" onclick="doReset()">設定変更後</button>
     <button class="btn cpurp btn-sm" onclick="endLatent()">潜伏終了</button>
   </div>
+</div>
+
+<!-- ⑥-b SCモード色分布 -->
+<div class="card">
+  <div class="ch">SC突入モード 色分布（本日）</div>
+  <div id="scModePie"></div>
 </div>
 
 <!-- ⑦ SC連続 + 潜伏G -->
@@ -768,6 +798,7 @@ let S = {
     sp:      {entered:0, hit:0},   // SP高確
     mystery: {entered:0, hit:0},   // 謎高確
   },
+  scModes: {chance:0, heaven:0, superHeaven:0},
   medals: 0,
   trigEvents: [],
 };
@@ -823,6 +854,7 @@ function newSession() {
   S.mode = 'normal'; S.g = 0; S.latG = 0; S.isReset = false;
   S.sessionG = 0; S.scCount = 0; S.scHistory = []; S.sabaRen = 0; S.superSaba = 0;
   S.triggers = {A:0,B:0,C:0,D:0}; S.trigEvents = [];
+  S.scModes = {chance:0, heaven:0, superHeaven:0};
   S.medals = 0;
   STORE.saveCur(S);
 }
@@ -899,6 +931,7 @@ function startAT() {
   S.g = 0; S.mode = 'at';
   STORE.saveCur(S);
   renderAll();
+  showSCColorPicker();
 }
 
 function endAT() {
@@ -1215,8 +1248,116 @@ function renderAll() {
   document.getElementById('advBox').innerHTML=buildAdvice();
   renderTopStatus();
   renderHighStats();
+  renderSCModePie();
   syncInputs();
   renderTrigLog();
+}
+
+/* ═══════════════════════════════════
+   SC COLOR PICKER
+═══════════════════════════════════ */
+function showSCColorPicker() {
+  const el = document.getElementById('scColorPrompt');
+  el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function recordSCColor(color) {
+  if (!S.scModes) S.scModes = {chance:0, heaven:0, superHeaven:0};
+  S.scModes[color] = (S.scModes[color] || 0) + 1;
+  document.getElementById('scColorPrompt').style.display = 'none';
+  const labels = {chance:'🔴チャンス', heaven:'🔵天国', superHeaven:'🏅超天国'};
+  addLog('SCモード: ' + labels[color]);
+  if (color === 'heaven')      showToast('🔵 青SC = 天国モード！ ベル1/7.5 連チャン大期待！');
+  if (color === 'superHeaven') showToast('🏅 金SC = 超天国モード確定！ ベル1/7.5 連チャン確実！');
+  renderAll();
+  STORE.saveCur(S);
+}
+
+/* ═══════════════════════════════════
+   SC MODE PIE CHART
+═══════════════════════════════════ */
+// 設定差公開後にここの数値を更新する
+const SC_MODE_THEORY = {
+  // [チャンス%, 天国%, 超天国%]  ← 設定1の理論値（2025年10月時点の公開データ）
+  // 設定差が公開されたら setting2~6 を追加
+  base: [80, 18.8, 1.2],
+};
+
+function renderSCModePie() {
+  const el = document.getElementById('scModePie');
+  if (!el) return;
+  const m = S.scModes || {chance:0, heaven:0, superHeaven:0};
+  const counts = [m.chance, m.heaven, m.superHeaven];
+  const total = counts.reduce((a,b)=>a+b,0);
+
+  if (total === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mu);font-size:13px">AT開始後にSCの色を記録すると<br>ここに分布グラフが表示されます</div>';
+    return;
+  }
+
+  const COLORS = ['#f85149','#58a6ff','#f0a83a'];
+  const LABELS = ['チャンス（赤）','天国（青）','超天国（金）'];
+  const THEORY = SC_MODE_THEORY.base;
+
+  // SVG pie chart
+  const r=52, cx=65, cy=65;
+  let angle=-90, paths='';
+  counts.forEach((c,i)=>{
+    if(c===0) return;
+    const deg=c/total*360;
+    if(Math.abs(deg-360)<0.5){
+      paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${COLORS[i]}"/>`;
+    } else {
+      const a1=angle*Math.PI/180, a2=(angle+deg)*Math.PI/180;
+      const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+      const x2=cx+r*Math.cos(a2), y2=cy+r*Math.sin(a2);
+      paths+=`<path d="M${cx},${cy}L${x1.toFixed(1)},${y1.toFixed(1)}A${r},${r} 0 ${deg>180?1:0},1 ${x2.toFixed(1)},${y2.toFixed(1)}Z" fill="${COLORS[i]}"/>`;
+    }
+    angle+=deg;
+  });
+
+  // 天国率の判定コメント
+  const heavenPct = total>0 ? (m.heaven+m.superHeaven)/total*100 : 0;
+  let judge='', judgeColor='var(--mu)';
+  if(total>=5 && heavenPct>=30){ judge='🔵 天国率が高い！高設定の可能性あり'; judgeColor='var(--bl)'; }
+  else if(total>=5 && heavenPct<=10){ judge='連チャン率は標準的'; judgeColor='var(--mu)'; }
+  else if(total>=3){ judge='サンプル蓄積中…'; judgeColor='var(--mu)'; }
+
+  const legend = counts.map((c,i)=>{
+    const pct=total>0?Math.round(c/total*100):0;
+    const diff=pct-THEORY[i];
+    const diffStr=diff===0?'±0':(diff>0?'+':'')+diff.toFixed(0);
+    const diffColor=i===0?(diff>5?'var(--rd)':'var(--gn)'):(diff>5?'var(--gn)':'var(--mu)');
+    return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid var(--c2)">
+      <div style="width:11px;height:11px;border-radius:2px;background:${COLORS[i]};flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:var(--tx)">${LABELS[i]}</div>
+      <div style="font-size:15px;font-weight:800;color:${COLORS[i]};min-width:36px;text-align:right">${c}回</div>
+      <div style="font-size:11px;color:${COLORS[i]};min-width:34px;text-align:right">${pct}%</div>
+      <div style="font-size:10px;color:${diffColor};min-width:40px;text-align:right">(${diffStr}%)</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+      <svg width="130" height="130" viewBox="0 0 130 130" style="flex-shrink:0">
+        ${paths}
+        <circle cx="${cx}" cy="${cy}" r="26" fill="var(--card)"/>
+        <text x="${cx}" y="${cy-5}" text-anchor="middle" fill="var(--mu)" font-size="9">合計</text>
+        <text x="${cx}" y="${cy+9}" text-anchor="middle" fill="var(--tx)" font-size="16" font-weight="700">${total}回</text>
+      </svg>
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--mu);display:flex;justify-content:flex-end;gap:6px;padding-bottom:3px">
+          <span>実績</span><span style="min-width:30px;text-align:right">%</span><span style="min-width:40px;text-align:right">vs理論</span>
+        </div>
+        ${legend}
+      </div>
+    </div>
+    ${judge?`<div style="font-size:13px;color:${judgeColor};font-weight:700;padding:6px 0">${judge}</div>`:''}
+    <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.6">
+      理論値: チャンス80% / 天国18.8% / 超天国1.2%<br>
+      <span style="color:var(--ye)">※ 設定差公開後に設定別理論値を反映予定</span>
+    </div>`;
 }
 
 /* ═══════════════════════════════════
