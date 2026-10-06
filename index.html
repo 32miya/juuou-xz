@@ -390,7 +390,10 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 
 <!-- ⑥-b SCモード色分布 -->
 <div class="card">
-  <div class="ch">SC突入モード 色分布（本日）</div>
+  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span>SC突入モード 色分布（本日）</span>
+    <button class="btn cblue btn-xs" style="padding:5px 10px;font-size:12px" onclick="showSCColorPicker()">＋ 色を記録</button>
+  </div>
   <div id="scModePie"></div>
 </div>
 
