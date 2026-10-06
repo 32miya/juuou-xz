@@ -68,6 +68,30 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
 .badge-gn{background:#0f2818;color:var(--gn)}
 .badge-rd{background:#2d0f0f;color:var(--rd)}
+
+/* MANUAL SESSION MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--card);border-radius:18px 18px 0 0;padding:18px 14px 36px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto}
+.modal-t{font-size:17px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal-x{color:var(--mu);font-size:24px;cursor:pointer;line-height:1}
+.mfield{width:100%;background:var(--c2);border:1px solid var(--bd);color:#fff;border-radius:8px;padding:9px 12px;font-size:16px;outline:none;-webkit-appearance:none}
+.mfield:focus{border-color:var(--bl)}
+.mrow{margin-bottom:10px}
+.mlbl{font-size:12px;color:var(--mu);margin-bottom:4px;display:block}
+.mgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.mrate{padding:10px;border:2px solid var(--bd);border-radius:8px;background:var(--c2);color:var(--mu);font-size:13px;font-weight:700;cursor:pointer;text-align:center}
+.mrate.on{border-color:var(--ye);background:#271a00;color:var(--ye)}
+.mbtn{width:100%;padding:14px;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.mbtn-save{background:#0f2818;color:var(--gn)}
+.mbtn-cancel{background:#21262d;color:#8b949e}
+.photo-hint{background:#0d1f40;border:1px solid var(--bl);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.7;margin-bottom:12px}
+.photo-hint strong{color:var(--bl)}
+.presave-preview{background:var(--c2);border-radius:8px;padding:10px;font-size:12px;margin-top:10px;line-height:1.7}
+.psv-bal{font-size:22px;font-weight:800;text-align:center;padding:8px 0}
+.add-session-btn{width:100%;padding:12px;border:2px dashed var(--bd);border-radius:10px;background:transparent;color:var(--bl);font-size:14px;font-weight:700;cursor:pointer;margin-bottom:4px}
+.add-session-btn:active{background:var(--c2)}
 </style>
 </head>
 <body>
@@ -159,22 +183,130 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
 
 <!-- ⑥ セッション詳細一覧 -->
 <div class="card">
-  <div class="ch">セッション詳細</div>
+  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span>セッション詳細</span>
+    <button class="add-session-btn" style="width:auto;padding:6px 12px;font-size:12px;margin-bottom:0" onclick="openAddModal()">＋ 過去の記録を追加</button>
+  </div>
   <div style="overflow-x:auto">
     <table class="dtable" id="sessTable">
       <thead>
-        <tr>
-          <th>日付・台</th><th>総G</th><th>SC</th><th>初当</th><th>収支</th>
-        </tr>
+        <tr><th>日付・台</th><th>総G</th><th>SC</th><th>初当</th><th>収支</th><th></th></tr>
       </thead>
       <tbody id="sessBody">
-        <tr><td colspan="5" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>
+        <tr><td colspan="6" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
 </div><!-- /page -->
+
+<!-- ═══ 過去セッション追加モーダル ═══ -->
+<div class="overlay" id="addModal" onclick="bgClose(event)">
+<div class="modal">
+  <div class="modal-t">
+    <span>📝 セッション記録を追加</span>
+    <span class="modal-x" onclick="closeAddModal()">✕</span>
+  </div>
+
+  <!-- 写真からのヒント -->
+  <div class="photo-hint" id="photoHint" style="display:none">
+    <strong>📷 昨日の写真から読み取ったデータ</strong><br>
+    日付: 2026-10-06 ／ 台: L獣王 #625<br>
+    ART確率: 1/120 ／ 最高連続: 5連 ／ 天井発動あり(997G)<br>
+    <span style="color:var(--mu)">↓ 下のフォームに反映済み。投資・収支を入力してください</span>
+  </div>
+
+  <!-- 日付・台番 -->
+  <div class="mgrid2" style="margin-bottom:10px">
+    <div class="mrow" style="margin-bottom:0">
+      <label class="mlbl">日付</label>
+      <input type="date" class="mfield" id="mDate">
+    </div>
+    <div class="mrow" style="margin-bottom:0">
+      <label class="mlbl">台番号（任意）</label>
+      <input type="text" class="mfield" id="mMachine" placeholder="例: #625">
+    </div>
+  </div>
+
+  <!-- レート -->
+  <div class="mrow">
+    <label class="mlbl">レート（円/枚）</label>
+    <div class="mgrid3">
+      <button class="mrate on" id="mr20" onclick="setMRate(20)">20円</button>
+      <button class="mrate"    id="mr10" onclick="setMRate(10)">10円</button>
+      <button class="mrate"    id="mr5"  onclick="setMRate(5)">5円</button>
+    </div>
+  </div>
+
+  <!-- G数・SC -->
+  <div class="mgrid2" style="margin-bottom:10px">
+    <div>
+      <label class="mlbl">プレイした総G数</label>
+      <input type="number" inputmode="numeric" class="mfield" id="mTotalG" placeholder="例: 2256" oninput="previewSave()">
+    </div>
+    <div>
+      <label class="mlbl">SC回数（自分の分）</label>
+      <input type="number" inputmode="numeric" class="mfield" id="mSC" placeholder="例: 18" oninput="previewSave()">
+    </div>
+  </div>
+  <div class="mgrid2" style="margin-bottom:10px">
+    <div>
+      <label class="mlbl">RB回数</label>
+      <input type="number" inputmode="numeric" class="mfield" id="mRB" placeholder="例: 3">
+    </div>
+    <div>
+      <label class="mlbl">最高連続</label>
+      <input type="number" inputmode="numeric" class="mfield" id="mMaxRen" placeholder="例: 5">
+    </div>
+  </div>
+
+  <!-- 収支 -->
+  <hr class="dv">
+  <div class="mrow">
+    <label class="mlbl">収支の入力方法</label>
+    <div class="mgrid2" style="margin-bottom:8px">
+      <button class="mrate on" id="mMethodMedal" onclick="setMMethod('medal')" style="font-size:12px">持ち枚数から自動計算</button>
+      <button class="mrate"    id="mMethodManual" onclick="setMMethod('manual')" style="font-size:12px">金額を直接入力</button>
+    </div>
+  </div>
+
+  <div id="mMedalSection">
+    <label class="mlbl">最終持ち枚数</label>
+    <input type="number" inputmode="numeric" class="mfield" id="mMedals" placeholder="例: 350" oninput="previewSave()">
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">投資額 = 総G × レートから自動計算</div>
+  </div>
+
+  <div id="mManualSection" style="display:none">
+    <div class="mgrid2">
+      <div>
+        <label class="mlbl">投資額（円）</label>
+        <input type="number" inputmode="numeric" class="mfield" id="mInvest" placeholder="例: 20000" oninput="previewSave()">
+      </div>
+      <div>
+        <label class="mlbl">収支（円）</label>
+        <input type="number" inputmode="numeric" class="mfield" id="mBalance" placeholder="例: -5000" oninput="previewSave()">
+      </div>
+    </div>
+  </div>
+
+  <!-- メモ -->
+  <div class="mrow" style="margin-top:10px">
+    <label class="mlbl">メモ（任意）</label>
+    <input type="text" class="mfield" id="mMemo" placeholder="例: 低グラフ台拾い、天井発動あり">
+  </div>
+
+  <!-- プレビュー -->
+  <div class="presave-preview" id="savePreview" style="display:none">
+    <div style="font-size:11px;color:var(--mu);margin-bottom:4px">保存内容プレビュー</div>
+    <div class="psv-bal" id="pvBal">±0円</div>
+    <div id="pvDetail" style="color:var(--mu)"></div>
+  </div>
+
+  <button class="mbtn mbtn-save" onclick="saveManualSession()">💾 保存する</button>
+  <button class="mbtn mbtn-cancel" onclick="closeAddModal()">キャンセル</button>
+</div>
+</div>
 
 <script>
 /* ─────────────────────────
@@ -194,7 +326,7 @@ let currentRate = 20;
    INIT
 ───────────────────────── */
 window.addEventListener('load', () => {
-  // 現在セッションからレートとG数を読み込む
+  initSeed();
   const cur = STORE.cur();
   if (cur) {
     currentRate = cur.rate || 20;
@@ -208,6 +340,34 @@ window.addEventListener('load', () => {
   buildDailyChart();
   buildSessionTable();
 });
+
+function initSeed() {
+  const all = STORE.all();
+  if (all.some(s => s.date === '2026-10-06')) return;
+  const invest = Math.round(6219 * (1000 / G50));
+  const recover = 1300 * 20;
+  all.push({
+    id: '20261006_625',
+    date: '2026-10-06',
+    machineNum: 1,
+    machineName: '#625',
+    rate: 20,
+    startTime: '',
+    endTime: '',
+    totalG: 6219,
+    scCount: 45,
+    avgHit: Math.round(6219 / 45),
+    sabaRen: 4,
+    superSaba: 0,
+    rbCount: 7,
+    memo: 'ART45回/RB7回 ※台#625途中着席',
+    finalMedals: 1300,
+    investYen: invest,
+    balanceYen: recover - invest,
+    manual: true,
+  });
+  localStorage.setItem('juuou_sess_v3', JSON.stringify(all));
+}
 
 /* ─────────────────────────
    RATE
@@ -408,21 +568,184 @@ function buildDailyChart() {
 function buildSessionTable() {
   const sessions = STORE.all();
   const tbody = document.getElementById('sessBody');
-  if (!sessions.length) return;
+  if (!sessions.length) { tbody.innerHTML = '<tr><td colspan="6" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>'; return; }
 
-  tbody.innerHTML = [...sessions].reverse().map(s => {
+  tbody.innerHTML = [...sessions].reverse().map((s, ri) => {
+    const i = sessions.length - 1 - ri; // original index
     const bal = s.balanceYen || 0;
     const cls = bal > 0 ? 'tgn' : bal < 0 ? 'trd' : '';
     const avg = s.avgHit ? '1/' + s.avgHit : '—';
     const d   = s.date ? s.date.slice(5).replace('-','/') : '—';
+    const machineName = s.machineName ? ` (${s.machineName})` : '';
+    const memo = s.memo ? `<div style="font-size:10px;color:var(--pu)">${s.memo}</div>` : '';
+    const manual = s.manual ? '<span style="font-size:9px;background:#1e3a8a;color:var(--bl);padding:1px 5px;border-radius:4px;margin-left:4px">手動</span>' : '';
     return `<tr>
-      <td>${d} 第${s.machineNum||'?'}台<br><span style="font-size:10px;color:var(--mu)">${s.startTime||''}〜${s.endTime||''}</span></td>
+      <td>${d} 第${s.machineNum||'?'}台${machineName}${manual}<br>
+        <span style="font-size:10px;color:var(--mu)">${s.startTime||''}${s.endTime?'〜'+s.endTime:''}</span>
+        ${memo}
+      </td>
       <td>${(s.totalG||0).toLocaleString()}G</td>
       <td>${s.scCount||0}回</td>
       <td>${avg}</td>
       <td class="${cls} bold">${(bal>=0?'+':'')+bal.toLocaleString()}円</td>
+      <td><button onclick="deleteSession(${i})" style="background:#2d0f0f;border:none;color:var(--rd);border-radius:4px;padding:3px 6px;font-size:11px;cursor:pointer">削除</button></td>
     </tr>`;
   }).join('');
+}
+
+function deleteSession(index) {
+  if (!confirm('このセッションを削除しますか？')) return;
+  const arr = STORE.all();
+  arr.splice(index, 1);
+  localStorage.setItem('juuou_sess_v3', JSON.stringify(arr));
+  rebuildAll();
+}
+
+/* ─────────────────────────
+   MANUAL SESSION MODAL
+───────────────────────── */
+let mRate = 20, mMethod = 'medal';
+
+function openAddModal(prefill) {
+  // デフォルト: 昨日の日付
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  document.getElementById('mDate').value = yStr;
+
+  if (prefill) {
+    // 写真データから事前入力
+    document.getElementById('photoHint').style.display = 'block';
+    if (prefill.machine) document.getElementById('mMachine').value = prefill.machine;
+    if (prefill.totalG)  document.getElementById('mTotalG').value  = prefill.totalG;
+    if (prefill.sc)      document.getElementById('mSC').value      = prefill.sc;
+    if (prefill.rb)      document.getElementById('mRB').value      = prefill.rb;
+    if (prefill.maxRen)  document.getElementById('mMaxRen').value  = prefill.maxRen;
+    if (prefill.memo)    document.getElementById('mMemo').value    = prefill.memo;
+  } else {
+    document.getElementById('photoHint').style.display = 'none';
+  }
+
+  previewSave();
+  document.getElementById('addModal').classList.add('open');
+}
+
+function closeAddModal() { document.getElementById('addModal').classList.remove('open'); }
+function bgClose(e) { if (e.target.id === 'addModal') closeAddModal(); }
+
+function setMRate(r) {
+  mRate = r;
+  [20,10,5].forEach(v => document.getElementById('mr'+v).classList.toggle('on', v===r));
+  previewSave();
+}
+
+function setMMethod(m) {
+  mMethod = m;
+  document.getElementById('mMedalSection').style.display  = m === 'medal'  ? '' : 'none';
+  document.getElementById('mManualSection').style.display = m === 'manual' ? '' : 'none';
+  document.getElementById('mMethodMedal').classList.toggle('on',  m === 'medal');
+  document.getElementById('mMethodManual').classList.toggle('on', m === 'manual');
+  previewSave();
+}
+
+function previewSave() {
+  const totalG  = parseInt(document.getElementById('mTotalG').value)  || 0;
+  const sc      = parseInt(document.getElementById('mSC').value)      || 0;
+  const medals  = parseInt(document.getElementById('mMedals').value)  || 0;
+  const mInv    = parseInt(document.getElementById('mInvest').value)  || 0;
+  const mBal    = parseInt(document.getElementById('mBalance').value) || 0;
+
+  let invest = 0, bal = 0, recover = 0;
+  if (mMethod === 'medal') {
+    invest  = Math.round(totalG * cpg(mRate));
+    recover = Math.round(medals * mRate);
+    bal     = recover - invest;
+  } else {
+    invest = mInv; bal = mBal; recover = invest + bal;
+  }
+
+  const pv = document.getElementById('savePreview');
+  if (totalG > 0 || medals > 0 || mInv > 0) {
+    pv.style.display = '';
+    const balEl = document.getElementById('pvBal');
+    balEl.textContent = (bal >= 0 ? '+' : '') + bal.toLocaleString() + '円';
+    balEl.className = 'psv-bal ' + (bal > 0 ? 'tgn' : bal < 0 ? 'trd' : 'zero');
+    document.getElementById('pvDetail').innerHTML =
+      `投資: ${invest.toLocaleString()}円 ／ 回収: ${recover.toLocaleString()}円<br>` +
+      `SC: ${sc}回 ／ 総G: ${totalG.toLocaleString()}G`;
+  } else {
+    pv.style.display = 'none';
+  }
+}
+
+function saveManualSession() {
+  const date    = document.getElementById('mDate').value;
+  const machine = document.getElementById('mMachine').value.trim();
+  const totalG  = parseInt(document.getElementById('mTotalG').value)  || 0;
+  const sc      = parseInt(document.getElementById('mSC').value)      || 0;
+  const rb      = parseInt(document.getElementById('mRB').value)      || 0;
+  const maxRen  = parseInt(document.getElementById('mMaxRen').value)  || 0;
+  const memo    = document.getElementById('mMemo').value.trim();
+  const medals  = parseInt(document.getElementById('mMedals').value)  || 0;
+  const mInv    = parseInt(document.getElementById('mInvest').value)  || 0;
+  const mBal    = parseInt(document.getElementById('mBalance').value) || 0;
+
+  if (!date) { alert('日付を入力してください'); return; }
+
+  let invest = 0, balanceYen = 0;
+  if (mMethod === 'medal') {
+    invest     = Math.round(totalG * cpg(mRate));
+    const rec  = Math.round(medals * mRate);
+    balanceYen = rec - invest;
+  } else {
+    invest     = mInv;
+    balanceYen = mBal;
+  }
+
+  // 今日までの同日セッション数を数えて台番号を決定
+  const all = STORE.all();
+  const sameDayCount = all.filter(s => s.date === date).length + 1;
+
+  const session = {
+    id: Date.now().toString(),
+    date,
+    machineNum: sameDayCount,
+    machineName: machine || null,
+    rate: mRate,
+    startTime: '',
+    endTime: '',
+    totalG,
+    scCount: sc,
+    avgHit: (sc > 0 && totalG > 0) ? Math.round(totalG / sc) : null,
+    sabaRen: maxRen,
+    superSaba: 0,
+    rbCount: rb,
+    memo: memo || null,
+    finalMedals: medals,
+    investYen: invest,
+    balanceYen,
+    manual: true,  // 手動入力フラグ
+  };
+
+  all.push(session);
+  localStorage.setItem('juuou_sess_v3', JSON.stringify(all));
+  closeAddModal();
+  rebuildAll();
+  alert(`保存しました！\n${date} 第${sameDayCount}台 / 収支: ${(balanceYen>=0?'+':'')+balanceYen.toLocaleString()}円`);
+}
+
+function rebuildAll() {
+  renderSummary();
+  // グラフを再構築（既存のchartインスタンスを破棄して再描画）
+  const sc = document.getElementById('sessionChart');
+  const dc = document.getElementById('dailyChart');
+  if (window._sessionChart) { window._sessionChart.destroy(); window._sessionChart = null; }
+  if (window._dailyChart)   { window._dailyChart.destroy();   window._dailyChart   = null; }
+  sc.style.display = ''; dc.style.display = '';
+  document.getElementById('sessionEmpty').style.display = 'none';
+  document.getElementById('dailyEmpty').style.display   = 'none';
+  buildSessionChart();
+  buildDailyChart();
+  buildSessionTable();
 }
 
 /* ─────────────────────────
