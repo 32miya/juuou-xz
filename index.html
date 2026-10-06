@@ -354,6 +354,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   <div style="font-size:12px;color:var(--mu);margin-bottom:10px" id="scExpNote">—</div>
   <div style="font-size:10px;color:var(--mu);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase">推奨継続ライン</div>
   <div class="cg" id="contLines"></div>
+  <div id="mustLine" style="margin-top:8px"></div>
 </div>
 
 <!-- ⑤ アドバイス -->
@@ -688,6 +689,64 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     ・夕方オレンジ or ダチョウ液晶通過 → 続行推奨<br>
     ・BB中ダチョウ揃いゼロ + 短い枚数 → 低設定の疑い<br>
     ・低グラフ台拾い後に連チャン → 底で高確が重なっていた
+  </div>
+</div>
+
+<!-- ⑩-b ヤメ時クイックガイド -->
+<div class="card">
+  <div class="ch" style="margin-bottom:8px">⛔ ヤメ時クイックガイド（絶対にやめない場面）</div>
+
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#2d0f0f;border-radius:8px;border-left:4px solid var(--rd)">
+      <div style="font-size:22px;flex-shrink:0">⛔</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--rd);margin-bottom:2px">潜伏区間中（SC終了後〜29G）</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">毎G全役でストック放出抽選中。絶対にやめない。</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#2d1a00;border-radius:8px;border-left:4px solid var(--or)">
+      <div style="font-size:22px;flex-shrink:0">⚠️</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--or);margin-bottom:2px">SC終了後 〜 100G</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">
+          30G目〜: SC高確移行の可能性あり<br>
+          100G: SC高確の最重要ゾーン<br>
+          <strong style="color:var(--ye)">サバ連後: 約50%でSP高確移行（強く推奨）</strong><br>
+          <strong style="color:var(--rd)">超サバ後: 100%でSP高確移行（絶対必須）</strong>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#271a00;border-radius:8px;border-left:4px solid var(--ye)">
+      <div style="font-size:22px;flex-shrink:0">📍</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--ye);margin-bottom:2px">偶数ゾーン（200G・400G・600G・800G）</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">SC高確移行率に設定差あり。高設定ほど移行しやすい。<br>各偶数ゾーンは確認してからヤメ判断。</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#1e0c38;border-radius:8px;border-left:4px solid var(--pu)">
+      <div style="font-size:22px;flex-shrink:0">💥</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--pu);margin-bottom:2px">天井圏（通常990G〜 / 設定変更後590G〜）</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">
+          SC or BIG or REG ボーナス確定。絶対に続行。<br>
+          <strong style="color:var(--ye)">設定変更後は天井599Gに短縮。</strong>一度サバ連すると天井は999Gに戻る。
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:#0d1f40;border-radius:8px;border-left:4px solid var(--bl)">
+      <div style="font-size:22px;flex-shrink:0">🔵</div>
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--bl);margin-bottom:2px">SP高確中・SC高確中・謎高確中</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">高確状態は必ずSC当選まで継続。高確中のヤメは厳禁。</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:11px;line-height:1.8;color:var(--mu)">
+    <strong style="color:var(--tx)">リセット仕様</strong><br>
+    設定変更 → 天井<strong style="color:var(--ye)">599G</strong>に短縮（機械割100%超）<br>
+    一度もサバ連せず単発終了 → 天井は<strong>599G継続</strong><br>
+    一度でもサバ連移行 → 天井は<strong>999Gに戻る</strong>
   </div>
 </div>
 
@@ -1196,6 +1255,63 @@ function renderContGuide() {
     }
   }
   document.getElementById('contLines').innerHTML=html;
+  renderMustLine();
+}
+
+function renderMustLine() {
+  const el = document.getElementById('mustLine');
+  if (!el) return;
+  const g=S.g, ceil=S.isReset?CEIL_R:CEIL_N, rem=ceil-g;
+  const sc=S.scCount;
+
+  let must='', mustColor='var(--rd)', rec='', recColor='var(--ye)', urgentMsg='', ng=false;
+
+  if (S.mode==='latent') {
+    if (S.latG<29) {
+      must='⛔ 潜伏完了まで '+(29-S.latG)+'G — 絶対にやめない';
+      rec='📍 できれば100G（SC高確ゾーン）'; ng=true;
+    } else {
+      must='⚠️ SC終了後100Gまで — 続行推奨';
+      rec='📍 200G（偶数ゾーン）も確認'; mustColor='var(--ye)'; ng=false;
+    }
+  } else if (S.mode==='at') {
+    must='⛔ AT消化中 — 終了後も潜伏29G必須';
+    rec=sc>=2?'⭐ サバ連後100G = SP高確移行ポイント':'📍 終了後は潜伏29G→100G確認'; ng=true;
+  } else if (S.mode==='sp') {
+    must='⛔ 100G — SP高確消化まで絶対継続'; ng=true;
+    rec='📍 天井'+ceil+'Gまで続行判断'; recColor='var(--mu)';
+  } else if (S.mode==='high'||S.mode==='mystery') {
+    must='⛔ SC当選まで継続 — 高確中のヤメ厳禁'; ng=true;
+    rec='📍 SC当選→潜伏29G→100G'; recColor='var(--ye)';
+  } else if (sc>=1&&g<100) {
+    if (S.superSaba>0||sc>=5) {
+      must='⛔ 100G — 超サバ後: SP高確移行100%確定'; mustColor='var(--rd)'; ng=true;
+    } else {
+      must='⚠️ 100G — サバ連後: SP高確移行約50%'; mustColor='var(--or)'; ng=false;
+    }
+    rec='📍 その後は偶数ゾーン（200G・400G）を確認'; recColor='var(--ye)';
+  } else if (rem<=80) {
+    must='⛔ 天井'+ceil+'G — 残り'+rem+'G 絶対続行！'; ng=true;
+    rec='🎯 SC or BIG or REG確定'; recColor='var(--pu)';
+  } else if (rem<=300) {
+    must='⚠️ 天井'+ceil+'G (残り'+rem+'G) — 続行推奨'; mustColor='var(--ye)'; ng=false;
+    const nextEven=Math.ceil((g+1)/200)*200;
+    rec='📍 次の偶数ゾーン: '+nextEven+'G'; recColor='var(--mu)';
+  } else {
+    const nz=Math.ceil((g+1)/100)*100;
+    const ne=Math.ceil((g+1)/200)*200;
+    must='📍 まず'+nz+'G（ゾーン確認）'; mustColor='var(--mu)'; ng=false;
+    rec='📍 偶数ゾーン: '+ne+'G（設定差あり）'; recColor='var(--mu)';
+  }
+
+  const bg  = ng ? 'rgba(248,81,73,.15)' : 'rgba(240,168,58,.1)';
+  const bdr = ng ? 'var(--rd)' : 'var(--ye)';
+  el.innerHTML=`
+    <div style="background:${bg};border:1px solid ${bdr};border-radius:8px;padding:10px">
+      <div style="font-size:10px;color:var(--mu);margin-bottom:4px;letter-spacing:.5px">ここまでは必ずやる</div>
+      <div style="font-size:14px;font-weight:800;color:${mustColor};line-height:1.4;margin-bottom:6px">${must}</div>
+      <div style="font-size:11px;color:${recColor};line-height:1.5">${rec}</div>
+    </div>`;
 }
 
 /* ═══════════════════════════════════
