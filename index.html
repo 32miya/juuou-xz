@@ -404,6 +404,32 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   </div>
 </div>
 
+<!-- ⑥-c サバチャンランプ色 -->
+<div class="card">
+  <div class="ch" style="margin-bottom:8px">サバチャンランプ色（SC中にタップ）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div class="scm-btn" style="background:#0a0a1a;border:2px solid var(--bl);padding:0;overflow:hidden;border-radius:10px" onclick="recordSCLamp('blue')">
+      <img src="img/sc_blue.jpg" style="width:100%;display:block;object-fit:cover" alt="青サバチャン">
+      <div style="padding:8px;text-align:center">
+        <div style="font-size:13px;font-weight:800;color:var(--bl)">🔵 青ランプ</div>
+        <div style="font-size:10px;color:var(--mu);line-height:1.5;margin-top:2px">ストック残り<strong style="color:var(--bl)">2個以上確定</strong><br>当該SC＋2セット継続確定！</div>
+        <div style="font-size:20px;font-weight:900;color:var(--bl);margin-top:4px" id="lamp-blue">0</div>
+      </div>
+    </div>
+    <div class="scm-btn" style="background:#1a1000;border:2px solid var(--or);padding:0;overflow:hidden;border-radius:10px" onclick="recordSCLamp('orange')">
+      <img src="img/sc_orange.jpg" style="width:100%;display:block;object-fit:cover" alt="通常オレンジ">
+      <div style="padding:8px;text-align:center">
+        <div style="font-size:13px;font-weight:800;color:var(--or)">🟠 通常ランプ</div>
+        <div style="font-size:10px;color:var(--mu);line-height:1.5;margin-top:2px">ストック残数は不明<br>終了後も潜伏29G必須</div>
+        <div style="font-size:20px;font-weight:900;color:var(--or);margin-top:4px" id="lamp-orange">0</div>
+      </div>
+    </div>
+  </div>
+  <div style="background:rgba(88,166,255,.08);border-left:3px solid var(--bl);border-radius:0 8px 8px 0;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--mu)" id="lampJudge">
+    ランプ色をタップして記録すると分析が表示されます
+  </div>
+</div>
+
 <!-- ⑥-b SC分布グラフ -->
 <div class="card" id="scModeCard">
   <div class="ch" style="margin-bottom:8px">SC突入色 本日の分布</div>
@@ -760,6 +786,7 @@ let S = {
     mystery: {entered:0, hit:0},   // 謎高確
   },
   scModes: {chance:0, heaven:0, superHeaven:0},
+  scLamp: {blue:0, orange:0},
   startG: 0,
   medals: 0,
   trigEvents: [],
@@ -818,6 +845,7 @@ function newSession() {
   S.sessionG = 0; S.scCount = 0; S.scHistory = []; S.sabaRen = 0; S.superSaba = 0;
   S.triggers = {A:0,B:0,C:0,D:0}; S.trigEvents = [];
   S.scModes = {chance:0, heaven:0, superHeaven:0};
+  S.scLamp  = {blue:0, orange:0};
   S.startG = 0;
   S.medals = 0;
   STORE.saveCur(S);
@@ -1268,6 +1296,28 @@ function showSCColorPicker() {
   card.scrollIntoView({behavior:'smooth', block:'center'});
   card.classList.add('scm-card-flash');
   setTimeout(() => card.classList.remove('scm-card-flash'), 1200);
+}
+
+function recordSCLamp(color) {
+  if (!S.scLamp) S.scLamp = {blue:0, orange:0};
+  S.scLamp[color]++;
+  const bl = document.getElementById('lamp-blue');
+  const or = document.getElementById('lamp-orange');
+  if (bl) bl.textContent = S.scLamp.blue;
+  if (or) or.textContent = S.scLamp.orange;
+
+  const total = S.scLamp.blue + S.scLamp.orange;
+  const bluePct = total > 0 ? Math.round(S.scLamp.blue / total * 100) : 0;
+  const j = document.getElementById('lampJudge');
+  if (j) {
+    if (color === 'blue') showToast('🔵 青ランプ！ストック残り2個以上確定！続行確定！');
+    let msg = `青ランプ: ${S.scLamp.blue}回 / 通常: ${S.scLamp.orange}回（青率 ${bluePct}%）`;
+    if (S.scLamp.blue >= 3) msg += '<br><strong style="color:var(--bl)">青ランプ多発 → ストック豊富な高設定傾向！</strong>';
+    else if (S.scLamp.blue >= 1) msg += '<br><span style="color:var(--bl)">青ランプ確認 → 残ストック2個以上の場面あり</span>';
+    j.innerHTML = msg;
+  }
+  addLog('SCランプ: ' + (color==='blue' ? '🔵青（ストック2個以上確定）' : '🟠通常'));
+  STORE.saveCur(S);
 }
 
 function recordSCColor(color) {
