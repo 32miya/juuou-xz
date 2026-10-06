@@ -221,7 +221,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <span>手動入力 / カメラ読み取り</span>
     <button class="cam-btn" onclick="openCamModal()">📷 カメラで読み取り</button>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
     <div>
       <div style="font-size:11px;color:var(--mu);margin-bottom:5px">今日の総G数</div>
       <input type="number" inputmode="numeric" class="big-inp" id="inputSessionG" placeholder="0" min="0" onchange="setSessionG(this.value)" onfocus="this.select()">
@@ -232,6 +232,15 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
       <input type="number" inputmode="numeric" class="big-inp" id="inputSCCount" placeholder="0" min="0" onchange="setSCDirect(this.value)" onfocus="this.select()">
       <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center">AT開始で自動カウント</div>
     </div>
+  </div>
+  <hr style="border:none;border-top:1px solid var(--bd);margin-bottom:10px">
+  <div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+      <span style="font-size:11px;color:var(--mu)">着席G数（途中から打つ場合）</span>
+      <span id="startGBadge" style="display:none;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;background:#0d1f40;color:var(--bl)">途中着席</span>
+    </div>
+    <input type="number" inputmode="numeric" class="big-inp" id="inputStartG" placeholder="0（オープン）" min="0" max="998" onchange="setStartG(this.value)" onfocus="this.select()">
+    <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center" id="startGNote">0 = オープン着席（最初から打つ）</div>
   </div>
 </div>
 
@@ -309,8 +318,11 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <button class="btn cgray btn-sm" onclick="addG(200)">+200</button>
   </div>
   <div style="margin-top:8px">
-    <div class="bar-hd"><span>0G</span><span id="barLbl">天井 999G</span></div>
-    <div class="bar-bg"><div class="bar-fill bfar" id="ceilBar" style="width:0%"></div></div>
+    <div class="bar-hd"><span id="barStart">0G</span><span id="barLbl">天井 999G</span></div>
+    <div class="bar-bg" style="display:flex;overflow:hidden">
+      <div id="prevBar" style="height:100%;background:#2d333b;flex-shrink:0;width:0%"></div>
+      <div class="bar-fill bfar" id="ceilBar" style="flex-shrink:0;width:0%;border-radius:0 3px 3px 0"></div>
+    </div>
     <div><span class="ctag ctfar" id="ceilTag">天井まで 999G</span></div>
   </div>
 </div>
@@ -799,6 +811,7 @@ let S = {
     mystery: {entered:0, hit:0},   // 謎高確
   },
   scModes: {chance:0, heaven:0, superHeaven:0},
+  startG: 0,
   medals: 0,
   trigEvents: [],
 };
@@ -838,6 +851,7 @@ window.addEventListener('load', () => {
     if (S.medals !== undefined) document.getElementById('medals').value = S.medals;
     if (S.sessionG) document.getElementById('inputSessionG').value = S.sessionG;
     if (S.scCount)  document.getElementById('inputSCCount').value  = S.scCount;
+    if (S.startG)   { document.getElementById('inputStartG').value = S.startG; setStartG(S.startG); }
   } else {
     newSession();
   }
@@ -855,6 +869,7 @@ function newSession() {
   S.sessionG = 0; S.scCount = 0; S.scHistory = []; S.sabaRen = 0; S.superSaba = 0;
   S.triggers = {A:0,B:0,C:0,D:0}; S.trigEvents = [];
   S.scModes = {chance:0, heaven:0, superHeaven:0};
+  S.startG = 0;
   S.medals = 0;
   STORE.saveCur(S);
 }
@@ -906,11 +921,29 @@ function setSCDirect(v) {
   renderAll();
 }
 
+function setStartG(v) {
+  const sg = Math.max(0, Math.min(998, parseInt(v) || 0));
+  S.startG = sg;
+  if (S.g < sg) { S.g = sg; }
+  const ceil = S.isReset ? CEIL_R : CEIL_N;
+  const noteEl = document.getElementById('startGNote');
+  const badgeEl = document.getElementById('startGBadge');
+  if (noteEl) noteEl.textContent = sg > 0
+    ? `途中着席: ${sg}G〜 天井まで残り${ceil - sg}G`
+    : '0 = オープン着席（最初から打つ）';
+  if (badgeEl) badgeEl.style.display = sg > 0 ? '' : 'none';
+  addLog('着席G数セット: ' + (sg > 0 ? sg + 'G〜（途中着席）' : '0G（オープン）'));
+  STORE.saveCur(S);
+  renderAll();
+}
+
 function syncInputs() {
   const gEl = document.getElementById('inputSessionG');
   const sEl = document.getElementById('inputSCCount');
-  if (gEl && document.activeElement !== gEl) gEl.value = S.sessionG || '';
-  if (sEl && document.activeElement !== sEl) sEl.value = S.scCount || '';
+  const sgEl = document.getElementById('inputStartG');
+  if (gEl  && document.activeElement !== gEl)  gEl.value  = S.sessionG || '';
+  if (sEl  && document.activeElement !== sEl)  sEl.value  = S.scCount  || '';
+  if (sgEl && document.activeElement !== sgEl) sgEl.value = S.startG   || '';
 }
 
 /* ═══════════════════════════════════
@@ -924,11 +957,13 @@ function startAT() {
     const names = {high:'SC高確',sp:'SP高確',mystery:'謎高確'};
     addLog('🎯 ' + names[S.mode] + 'からSC当選！');
   }
-  S.scHistory.push({g: S.g, time: nowStr(), fromState: S.mode});
-  S.sessionG += S.g;
+  const myG = S.g - (S.startG || 0);
+  S.scHistory.push({g: S.g, myG: myG, time: nowStr(), fromState: S.mode});
+  S.sessionG += myG;
   S.scCount++;
-  addLog('AT開始(' + S.g + 'G) — ' + S.scCount + '連目 | 今日総G:' + S.sessionG);
-  S.g = 0; S.mode = 'at';
+  const seatNote = S.startG > 0 ? `（着席${S.startG}G〜${S.g}G / 自分${myG}G）` : '';
+  addLog(`AT開始(${S.g}G)${seatNote} — ${S.scCount}連目 | 自分の総G:${S.sessionG}`);
+  S.g = 0; S.startG = 0; S.mode = 'at';
   STORE.saveCur(S);
   renderAll();
   showSCColorPicker();
@@ -1212,11 +1247,22 @@ function buildAdvice() {
    CEILING BAR
 ═══════════════════════════════════ */
 function renderCeil() {
-  const ceil=S.isReset?CEIL_R:CEIL_N, g=S.g, rem=ceil-g;
-  const pct=Math.min(100,g/ceil*100);
-  const bar=document.getElementById('ceilBar');
-  bar.style.width=pct+'%';
-  bar.className='bar-fill '+(pct<60?'bfar':pct<85?'bmid':'bnear');
+  const ceil=S.isReset?CEIL_R:CEIL_N, g=S.g, sg=S.startG||0, rem=ceil-g;
+  const totalPct=Math.min(100,g/ceil*100);
+  const prevPct=Math.min(100,sg/ceil*100);
+  const myPct=Math.max(0,Math.min(100-prevPct,(g-sg)/ceil*100));
+
+  const prevBar=document.getElementById('prevBar');
+  const myBar=document.getElementById('ceilBar');
+  if(prevBar) prevBar.style.width=prevPct+'%';
+  if(myBar){
+    myBar.style.width=myPct+'%';
+    const isZone=rem<=15;
+    myBar.className='bar-fill '+(isZone?'bzone':totalPct<60?'bfar':totalPct<85?'bmid':'bnear');
+  }
+
+  const startEl=document.getElementById('barStart');
+  if(startEl) startEl.textContent=sg>0?'着席'+sg+'G〜':'0G';
   document.getElementById('barLbl').textContent='天井 '+ceil+'G';
   const tag=document.getElementById('ceilTag');
   if(rem<=15){tag.className='ctag ctzone';tag.textContent='天井発動ゾーン！残り'+rem+'G';}
