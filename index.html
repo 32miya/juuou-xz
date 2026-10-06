@@ -104,6 +104,11 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 .lat-num{font-size:46px;font-weight:900;color:#a78bfa;line-height:1;cursor:pointer;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:8px 14px;text-align:center;min-width:90px}
 .lat-num:active{background:var(--c2)}
 
+/* SC MODE BUTTONS */
+.scm-btn{padding:12px 6px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .1s,box-shadow .2s;width:100%;border:2px solid transparent}
+.scm-btn:active{transform:scale(.93)}
+.scm-btn.flash{box-shadow:0 0 0 3px var(--bl)}
+
 /* TRIGGERS */
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
 .trig{padding:14px 8px;border-radius:10px;border:2px solid transparent;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:transform .1s,border-color .3s}
@@ -353,29 +358,6 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <button class="btn cyel btn-lg" onclick="endAT()">✅ AT終了→潜伏</button>
   </div>
 
-  <!-- SC色ピッカー (AT開始後に表示) -->
-  <div id="scColorPrompt" style="display:none;margin-top:10px;padding:12px;background:rgba(88,166,255,.08);border:1px solid var(--bl);border-radius:10px">
-    <div style="font-size:12px;color:var(--bl);font-weight:700;text-align:center;margin-bottom:8px">🎰 このSCの色（突入時タイトル）は？</div>
-    <div class="g3">
-      <button class="btn cred" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px" onclick="recordSCColor('chance')">
-        <span style="font-size:20px">🔴</span>
-        <span style="font-size:12px;font-weight:700">赤</span>
-        <span style="font-size:10px;opacity:.8">チャンス</span>
-      </button>
-      <button class="btn cblue" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px;border:2px solid var(--bl)" onclick="recordSCColor('heaven')">
-        <span style="font-size:20px">🔵</span>
-        <span style="font-size:12px;font-weight:700">青</span>
-        <span style="font-size:10px;opacity:.8">天国濃厚!</span>
-      </button>
-      <button class="btn cyel" style="flex-direction:column;display:flex;align-items:center;gap:2px;padding:10px 4px" onclick="recordSCColor('superHeaven')">
-        <span style="font-size:20px">🏅</span>
-        <span style="font-size:12px;font-weight:700">金</span>
-        <span style="font-size:10px;opacity:.8">超天国確定</span>
-      </button>
-    </div>
-    <button class="btn cgray btn-xs" style="width:100%;margin-top:8px" onclick="document.getElementById('scColorPrompt').style.display='none'">スキップ（不明）</button>
-  </div>
-
   <div class="g3" style="margin-top:8px">
     <button class="btn cblue btn-sm" onclick="setMode('high')">SC高確</button>
     <button class="btn cred btn-sm" onclick="setMode('sp')">SP高確</button>
@@ -389,10 +371,30 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 </div>
 
 <!-- ⑥-b SCモード色分布 -->
-<div class="card">
-  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <span>SC突入モード 色分布（本日）</span>
-    <button class="btn cblue btn-xs" style="padding:5px 10px;font-size:12px" onclick="showSCColorPicker()">＋ 色を記録</button>
+<div class="card" id="scModeCard">
+  <div class="ch" style="margin-bottom:10px">SC突入色（タップで記録）＋ 本日の分布</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+    <button class="scm-btn" style="background:#2d0f0f" onclick="recordSCColor('chance')">
+      <span style="font-size:26px">🔴</span>
+      <span style="font-size:13px;font-weight:800;color:var(--rd)">赤</span>
+      <span style="font-size:10px;color:var(--mu)">チャンス</span>
+      <span style="font-size:22px;font-weight:900;color:var(--rd)" id="scc-chance">0</span>
+      <span style="font-size:9px;color:var(--mu)">回</span>
+    </button>
+    <button class="scm-btn" style="background:#0d1f40;border-color:var(--bl)" onclick="recordSCColor('heaven')">
+      <span style="font-size:26px">🔵</span>
+      <span style="font-size:13px;font-weight:800;color:var(--bl)">青</span>
+      <span style="font-size:10px;color:var(--mu)">天国濃厚!</span>
+      <span style="font-size:22px;font-weight:900;color:var(--bl)" id="scc-heaven">0</span>
+      <span style="font-size:9px;color:var(--mu)">回</span>
+    </button>
+    <button class="scm-btn" style="background:#271a00" onclick="recordSCColor('superHeaven')">
+      <span style="font-size:26px">🏅</span>
+      <span style="font-size:13px;font-weight:800;color:var(--ye)">金</span>
+      <span style="font-size:10px;color:var(--mu)">超天国確定</span>
+      <span style="font-size:22px;font-weight:900;color:var(--ye)" id="scc-super">0</span>
+      <span style="font-size:9px;color:var(--mu)">回</span>
+    </button>
   </div>
   <div id="scModePie"></div>
 </div>
@@ -1306,9 +1308,11 @@ function renderAll() {
    SC COLOR PICKER
 ═══════════════════════════════════ */
 function showSCColorPicker() {
-  const el = document.getElementById('scColorPrompt');
-  el.style.display = 'block';
-  el.scrollIntoView({behavior:'smooth', block:'center'});
+  const card = document.getElementById('scModeCard');
+  if (!card) return;
+  card.scrollIntoView({behavior:'smooth', block:'center'});
+  card.classList.add('flash');
+  setTimeout(() => card.classList.remove('flash'), 1200);
 }
 
 function recordSCColor(color) {
@@ -1339,6 +1343,12 @@ function renderSCModePie() {
   const m = S.scModes || {chance:0, heaven:0, superHeaven:0};
   const counts = [m.chance, m.heaven, m.superHeaven];
   const total = counts.reduce((a,b)=>a+b,0);
+
+  // ボタンのカウント更新
+  const cc=document.getElementById('scc-chance'), ch=document.getElementById('scc-heaven'), cs=document.getElementById('scc-super');
+  if(cc) cc.textContent=m.chance;
+  if(ch) ch.textContent=m.heaven;
+  if(cs) cs.textContent=m.superHeaven;
 
   if (total === 0) {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mu);font-size:13px">AT開始後にSCの色を記録すると<br>ここに分布グラフが表示されます</div>';
