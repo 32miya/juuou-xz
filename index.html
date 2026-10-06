@@ -453,17 +453,17 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ サバ連2連目以降のモード振り分け</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
     <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
-      <div style="font-size:10px;color:var(--mu)">チャンス</div>
+      <div style="font-size:10px;color:var(--mu)">チャンス 🔴</div>
       <div style="font-size:20px;font-weight:800;color:var(--ye)">80%</div>
       <div style="font-size:10px;color:var(--mu)">ベル 1/42.7</div>
     </div>
-    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
-      <div style="font-size:10px;color:var(--mu)">天国</div>
+    <div style="background:#0d1f40;border:1px solid var(--bl);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--bl)">天国 🔵</div>
       <div style="font-size:20px;font-weight:800;color:var(--or)">18.8%</div>
       <div style="font-size:10px;color:var(--mu)">ベル 1/7.5</div>
     </div>
-    <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
-      <div style="font-size:10px;color:var(--mu)">超天国</div>
+    <div style="background:#1e0c38;border:1px solid var(--pu);border-radius:8px;padding:8px;text-align:center">
+      <div style="font-size:10px;color:var(--pu)">超天国 🏅</div>
       <div style="font-size:20px;font-weight:800;color:var(--pu)">1.2%</div>
       <div style="font-size:10px;color:var(--mu)">ベル 1/7.5</div>
     </div>
@@ -1043,13 +1043,15 @@ function statsOf(arr) {
   };
 }
 
+// ★ 解析確定値（2026-10-07更新）
+// 設定1:1/326.5 / 設定2:1/321.6 / 設定4:1/295.8 / 設定5:1/287.6 / 設定6:1/279.7
 function estimateSetting(avgHit, count) {
   if (!avgHit || count < 2) return {lbl:'不明', color:'var(--mu)', note:'データ不足 ('+count+'回分)'};
-  if (avgHit <= 283) return {lbl:'設定6',    color:'#ffd700',    note:'1/'+avgHit+' ← 設定6: 1/279'};
-  if (avgHit <= 291) return {lbl:'設定5〜6', color:'var(--rd)',   note:'1/'+avgHit+' ← 設定5: 1/287'};
-  if (avgHit <= 305) return {lbl:'設定4以上',color:'var(--gn)',   note:'1/'+avgHit+' ← 設定4: 1/295'};
-  if (avgHit <= 322) return {lbl:'設定2〜4', color:'var(--ye)',   note:'1/'+avgHit+' ← 設定2: 1/321'};
-  return                     {lbl:'設定1〜2', color:'var(--mu)',   note:'1/'+avgHit+' ← 設定1: 1/326'};
+  if (avgHit <= 283) return {lbl:'設定6',    color:'#ffd700',    note:'1/'+avgHit+' ← 設定6: 1/279.7'};
+  if (avgHit <= 291) return {lbl:'設定5〜6', color:'var(--rd)',   note:'1/'+avgHit+' ← 設定5: 1/287.6'};
+  if (avgHit <= 309) return {lbl:'設定4以上',color:'var(--gn)',   note:'1/'+avgHit+' ← 設定4: 1/295.8'};
+  if (avgHit <= 324) return {lbl:'設定2〜4', color:'var(--ye)',   note:'1/'+avgHit+' ← 設定2: 1/321.6'};
+  return                     {lbl:'設定1〜2', color:'var(--mu)',   note:'1/'+avgHit+' ← 設定1: 1/326.5'};
 }
 
 /* ═══════════════════════════════════
@@ -1414,8 +1416,9 @@ function renderSCModePie() {
     </div>
     ${judge?`<div style="font-size:13px;color:${judgeColor};font-weight:700;padding:6px 0">${judge}</div>`:''}
     <div style="font-size:10px;color:var(--mu);margin-top:4px;line-height:1.6">
-      理論値: チャンス80% / 天国18.8% / 超天国1.2%<br>
-      <span style="color:var(--ye)">※ 設定差公開後に設定別理論値を反映予定</span>
+      理論値（確定）: チャンス80% / 天国18.8% / 超天国1.2%<br>
+      <span style="color:var(--pu);font-weight:700">🏅 超天国後 → 次回のモードが天国以上確定！</span><br>
+      <span style="color:var(--ye)">※ 設定別振り分け差は情報公開次第更新</span>
     </div>`;
 }
 

@@ -156,6 +156,29 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
     <div class="hist-cell"><label>2回前G</label><input type="number" inputmode="numeric" id="h2" placeholder="22" oninput="analyze()"></div>
     <div class="hist-cell"><label>3回前G</label><input type="number" inputmode="numeric" id="h3" placeholder="142" oninput="analyze()"></div>
   </div>
+
+  <!-- 設定判別情報（新解析情報） -->
+  <hr class="dv" style="margin-top:12px">
+  <div class="ch">設定判別情報（任意）</div>
+  <div class="inp-grid">
+    <div class="inp-box">
+      <label>謎高確 観測回数</label>
+      <input type="number" inputmode="numeric" id="iMystery" placeholder="0" min="0" max="99" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">レア役/ゾーン以外から高確移行した回数</div>
+    </div>
+    <div class="inp-box">
+      <label>サミートロフィー</label>
+      <select id="iTrophy" onchange="analyze()" style="width:100%;background:var(--c2);border:2px solid var(--bd);border-radius:8px;color:var(--tx);font-size:22px;font-weight:800;padding:8px;outline:none;-webkit-appearance:none">
+        <option value="0">なし</option>
+        <option value="1">🥉 銅（設定2以上）</option>
+        <option value="2">🥈 銀（設定3以上）</option>
+        <option value="3">🥇 金（設定4以上）</option>
+        <option value="4">🦒 キリン（設定5以上）</option>
+        <option value="5">🌈 虹（設定6確定！）</option>
+      </select>
+      <div class="inp-sub">AT終了画面に出現</div>
+    </div>
+  </div>
 </div>
 
 <!-- ② 総合判定 -->
@@ -231,12 +254,14 @@ const CPG_20 = 1000/31.8; // 円/G (20円スロット)
 ───────────────────────── */
 function vals() {
   return {
-    art:    parseInt(document.getElementById('iArt').value)||0,
-    rb:     parseInt(document.getElementById('iRb').value)||0,
-    curG:   parseInt(document.getElementById('iCurG').value)||0,
-    totalG: parseInt(document.getElementById('iTotalG').value)||0,
-    artG:   parseInt(document.getElementById('iArtG').value)||0,
-    maxRen: parseInt(document.getElementById('iMaxRen').value)||0,
+    art:     parseInt(document.getElementById('iArt').value)||0,
+    rb:      parseInt(document.getElementById('iRb').value)||0,
+    curG:    parseInt(document.getElementById('iCurG').value)||0,
+    totalG:  parseInt(document.getElementById('iTotalG').value)||0,
+    artG:    parseInt(document.getElementById('iArtG').value)||0,
+    maxRen:  parseInt(document.getElementById('iMaxRen').value)||0,
+    mystery: parseInt(document.getElementById('iMystery').value)||0,
+    trophy:  parseInt(document.getElementById('iTrophy').value)||0,
     h: [1,2,3].map(i => parseInt(document.getElementById('h'+i).value)||null),
   };
 }
@@ -305,6 +330,25 @@ function analyze() {
   else if (v.maxRen >= 3) renPts = 5;
   factors.push({name:'最高連続 '+v.maxRen+'連', pts:renPts, max:15});
   score += renPts;
+
+  // 5. 謎高確 観測回数 (0-20点) ← 設定差最大の指標
+  let mysPts = 0;
+  if      (v.mystery >= 5) mysPts = 20;
+  else if (v.mystery >= 3) mysPts = 15;
+  else if (v.mystery >= 2) mysPts = 10;
+  else if (v.mystery >= 1) mysPts = 5;
+  if (v.mystery > 0) {
+    factors.push({name:`謎高確 ${v.mystery}回（設定差最大★ 設定1:1/1000 設定6:2倍以上）`, pts:mysPts, max:20});
+    score += mysPts;
+  }
+
+  // 6. サミートロフィー (0-30点) ← 設定確定系
+  const TROPHY_LABELS = ['','銅=設定2以上','銀=設定3以上','金=設定4以上','キリン=設定5以上','虹=設定6確定'];
+  const TROPHY_PTS    = [0, 5, 10, 18, 25, 30];
+  if (v.trophy > 0) {
+    factors.push({name:`🏆 サミートロフィー: ${TROPHY_LABELS[v.trophy]}`, pts:TROPHY_PTS[v.trophy], max:30});
+    score += TROPHY_PTS[v.trophy];
+  }
 
   // ── 判定 ──
   const verdict = buildVerdict(score, v, artRate, remG, rbRatio);
