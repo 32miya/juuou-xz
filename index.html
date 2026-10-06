@@ -451,7 +451,128 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   </div>
 </div>
 
-<!-- ⑩ セッション履歴 -->
+<!-- ⑩ BB/RB攻略・演出ガイド -->
+<div class="card">
+  <div class="ch">BB/RB打ち方 ＆ 演出の意味</div>
+
+  <!-- 背景演出 -->
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ 背景演出 — 台の状態を読む</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:#0d1a0d;border:2px solid var(--gn);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:22px">🌿</div>
+      <div style="font-size:13px;font-weight:800;color:var(--gn);margin:4px 0">昼（グリーン）</div>
+      <div style="font-size:11px;color:var(--mu)">通常状態<br>SC高確移行なし<br><strong style="color:var(--rd)">ハマり継続の可能性</strong></div>
+    </div>
+    <div style="background:#1a1200;border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center">
+      <div style="font-size:22px">🌅</div>
+      <div style="font-size:13px;font-weight:800;color:var(--or);margin:4px 0">夕方（オレンジ）</div>
+      <div style="font-size:11px;color:var(--mu)">SC高確示唆！<br>次のSC当選に期待<br><strong style="color:var(--gn)">継続強く推奨</strong></div>
+    </div>
+  </div>
+
+  <!-- BB攻略 -->
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ BB(ビッグボーナス)中の攻略 — 15G継続</div>
+  <div style="background:rgba(248,81,73,.15);border:1px solid var(--rd);border-radius:10px;padding:12px;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:800;color:var(--rd);margin-bottom:8px">⚠️ ダチョウ揃いの打ち方</div>
+    <div style="font-size:13px;line-height:1.8">
+      <strong>① カットイン発生時だけ有効！</strong><br>
+      カットインなし = ダチョウは揃わない（普通に打つ）<br><br>
+      <strong>② 必ず逆押し（右→中→左）</strong><br>
+      <span style="background:var(--c2);padding:2px 8px;border-radius:6px;font-size:12px">右リール → 中リール → 左リール</span><br>
+      ※通常の左→中→右では<span style="color:var(--rd)">絶対に揃いません</span><br><br>
+      <strong>③ 右リール下段にダチョウを狙う</strong><br>
+      下段停止でダチョウ揃い濃厚 → ストック獲得！
+    </div>
+  </div>
+  <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.8;margin-bottom:8px">
+    <strong>ループストック抽選（160枚以上獲得で突入: 11.1%）</strong><br>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px;text-align:center">
+      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
+        <div style="font-size:10px;color:var(--mu)">1%</div>
+        <div style="font-size:13px;font-weight:700;color:var(--mu)">16.4%</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
+        <div style="font-size:10px;color:var(--mu)">25%</div>
+        <div style="font-size:13px;font-weight:700;color:var(--bl)">16.4%</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
+        <div style="font-size:10px;color:var(--mu)">50%</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ye)">32.8%</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
+        <div style="font-size:10px;color:var(--mu)">66%</div>
+        <div style="font-size:13px;font-weight:700;color:var(--or)">32.8%</div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
+        <div style="font-size:10px;color:var(--mu)">80%</div>
+        <div style="font-size:13px;font-weight:700;color:var(--rd)">1.6%</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--mu);margin-top:4px">約3回に2回は50%以上のループ率が選択される</div>
+  </div>
+
+  <!-- RB攻略 -->
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ RB(レギュラーボーナス)中 — 10G継続・本機最強</div>
+  <div style="background:rgba(63,185,80,.15);border:1px solid var(--gn);border-radius:10px;padding:12px;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:800;color:var(--gn);margin-bottom:6px">👑 RBは超サバへの近道！</div>
+    <div style="font-size:13px;line-height:1.8">
+      押し順ベル成立で<strong style="color:var(--ye)">約66%</strong>の確率でSCストック獲得<br>
+      ※ほぼ毎回ストックが増える = 超サバに直結<br>
+      REGが来たら即ナビに従い、押し順は絶対に守ること
+    </div>
+  </div>
+
+  <!-- タマゴランプ -->
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ タマゴランプ（ダチョウの卵） = SCストック数示唆</div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">
+    <div style="background:#222;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">🥚</div>
+      <div style="font-size:10px;color:#ccc;font-weight:700">白</div>
+      <div style="font-size:11px;color:var(--mu)">1個</div>
+    </div>
+    <div style="background:#0a1530;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">💙</div>
+      <div style="font-size:10px;color:var(--bl);font-weight:700">青</div>
+      <div style="font-size:11px;color:var(--mu)">2個</div>
+    </div>
+    <div style="background:#1a1500;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">💛</div>
+      <div style="font-size:10px;color:#fde68a;font-weight:700">黄</div>
+      <div style="font-size:11px;color:var(--mu)">3個</div>
+    </div>
+    <div style="background:#0d1a0d;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">💚</div>
+      <div style="font-size:10px;color:var(--gn);font-weight:700">緑</div>
+      <div style="font-size:11px;color:var(--mu)">4個</div>
+    </div>
+    <div style="background:#2d0f0f;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">❤️</div>
+      <div style="font-size:10px;color:var(--rd);font-weight:700">赤</div>
+      <div style="font-size:11px;color:var(--mu)">5個</div>
+    </div>
+    <div style="background:#1e0c38;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">💜</div>
+      <div style="font-size:10px;color:var(--pu);font-weight:700">紫</div>
+      <div style="font-size:11px;color:var(--mu)">6個</div>
+    </div>
+    <div style="background:#1a0e20;border-radius:6px;padding:6px 2px">
+      <div style="font-size:16px">🌈</div>
+      <div style="font-size:10px;color:#f0a8f0;font-weight:700">虹</div>
+      <div style="font-size:11px;color:var(--mu)">7個</div>
+    </div>
+  </div>
+
+  <!-- 実戦経験則 -->
+  <div style="margin-top:10px;padding:10px;background:rgba(240,168,58,.08);border-left:3px solid var(--ye);border-radius:0 8px 8px 0;font-size:12px;line-height:1.7">
+    <strong style="color:var(--ye)">💡 実戦で確認された法則</strong><br>
+    ・グリーン（昼）のまま → ハマり継続の可能性大 → やめ時を検討<br>
+    ・すぐに夕方色に変わる → 高確状態が続いている好調台<br>
+    ・低グラフ台を拾った直後に連チャン → 底で高確が重なっていた<br>
+    ・1000G超のハマりは天井(999G)発動後に再ハマりの可能性
+  </div>
+</div>
+
+<!-- ⑪ セッション履歴 -->
 <div class="card">
   <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0">
     <span>セッション履歴</span>
@@ -937,7 +1058,10 @@ function buildAdvice() {
     case 'sp':     return av('red','🔴 SP高確！継続必須','次のSC当選でサバ連濃厚！<br><strong>100G超まで絶対継続。</strong>');
     case 'high':   return av('green','✅ SC高確中','全役でSC抽選中（期待度 約50%）。<br>チャンス目・チェリーに注目。');
     case 'mystery':return av('purp','💜 謎高確中','ゾーン外から高確移行。設定6は2倍以上発生。<br><strong>継続強く推奨。</strong>');
-    case 'bonus':  return av('yellow','👑 ボーナス消化中','超サバ後は4大トリガー発生率UP。');
+    case 'bonus':  return av('yellow','👑 ボーナス消化中',
+      'BIG中: <strong>カットイン発生時だけ逆押し（右→中→左）でダチョウ狙い</strong><br>' +
+      '160枚以上獲得でループストック突入(11.1%)<br>' +
+      'RB中: 押し順ベル<strong>約66%でストック獲得</strong> — ナビ従うこと');
     default:
       if(rem<=15) return av('purp','💥 天井発動ゾーン！'+g+'G (残り'+rem+'G)','<strong>天井'+ceil+'G確実！</strong>恩恵: SC or BIG or REG');
       if(rem<=80) return av('red','⚠️ 天井圏 '+g+'G (残り'+rem+'G)','天井まであと'+rem+'G。継続。');
