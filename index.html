@@ -161,6 +161,10 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 .big-inp{width:100%;background:var(--c2);border:2px solid var(--bd);border-radius:10px;color:var(--tx);font-size:32px;font-weight:900;padding:10px 8px;text-align:center;-webkit-appearance:none;outline:none;transition:border-color .2s}
 .big-inp:focus{border-color:var(--bl)}
 .big-inp::placeholder{color:var(--bd)}
+.cam-btn{padding:6px 12px;background:var(--c2);border:1px solid var(--bd);border-radius:8px;color:var(--bl);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.cam-assign{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.cam-num{font-size:24px;font-weight:900;color:var(--ye);min-width:80px}
+.cam-sel{flex:1;background:var(--c2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:9px 8px;font-size:14px;outline:none}
 </style>
 </head>
 <body>
@@ -210,7 +214,10 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 
 <!-- ① 手動入力 -->
 <div class="card">
-  <div class="ch">手動入力（セッション総G数 / SC回数）</div>
+  <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span>手動入力 / カメラ読み取り</span>
+    <button class="cam-btn" onclick="openCamModal()">📷 カメラで読み取り</button>
+  </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
     <div>
       <div style="font-size:11px;color:var(--mu);margin-bottom:5px">今日の総G数</div>
@@ -222,6 +229,58 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
       <input type="number" inputmode="numeric" class="big-inp" id="inputSCCount" placeholder="0" min="0" onchange="setSCDirect(this.value)" onfocus="this.select()">
       <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center">AT開始で自動カウント</div>
     </div>
+  </div>
+</div>
+
+<!-- カメラ読み取りモーダル -->
+<div class="overlay" id="camModal" onclick="bgClose(event,'camModal')">
+  <div class="modal">
+    <div class="modal-t">📷 カメラ読み取り <span class="modal-x" onclick="closeModal('camModal')">✕</span></div>
+
+    <!-- STEP 1: 撮影 -->
+    <div id="camS1">
+      <p style="color:var(--mu);font-size:13px;line-height:1.7;margin-bottom:14px">
+        台のデータ表示（G数・SC回数など）を<strong>できるだけ近づけて</strong>撮影してください。<br>
+        <span style="color:var(--ye)">初回のみ OCRライブラリ読み込みに数秒かかります。</span>
+      </p>
+      <input type="file" id="camInput" accept="image/*" capture="environment" style="display:none" onchange="onCamFile(event)">
+      <button class="btn cblue btn-lg" style="width:100%;margin-bottom:8px" onclick="document.getElementById('camInput').click()">
+        📷 カメラで撮影する
+      </button>
+      <button class="btn cgray btn-sm" style="width:100%" onclick="document.getElementById('camInput').setAttribute('capture','');document.getElementById('camInput').click()">
+        📁 画像を選択する
+      </button>
+      <div style="margin-top:12px;padding:10px;background:var(--c2);border-radius:8px;font-size:12px;color:var(--mu);line-height:1.6">
+        ⚠️ 精度について: LED/液晶表示は読み取りにくい場合があります。<br>
+        認識後に必ず数値を確認・修正してください。
+      </div>
+    </div>
+
+    <!-- STEP 2: プレビュー + OCR実行 -->
+    <div id="camS2" style="display:none">
+      <div style="position:relative;margin-bottom:12px">
+        <img id="camPreview" style="width:100%;border-radius:8px;display:block" alt="撮影した画像">
+        <canvas id="camCanvas" style="display:none"></canvas>
+      </div>
+      <div id="camStatus" style="text-align:center;color:var(--mu);font-size:13px;margin-bottom:10px;min-height:20px"></div>
+      <div class="g2">
+        <button class="btn cgray" onclick="camReset()">撮り直し</button>
+        <button class="btn cblue btn-lg" id="camOCRBtn" onclick="camRunOCR()">🔍 数字を読み取る</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 認識結果 + 割り当て -->
+    <div id="camS3" style="display:none">
+      <div style="font-size:12px;color:var(--mu);margin-bottom:8px">
+        認識された数字を確認し、該当する項目を選択してください
+      </div>
+      <div id="camResults"></div>
+      <div class="g2" style="margin-top:12px">
+        <button class="btn cgray" onclick="camReset()">やり直し</button>
+        <button class="btn cgreen btn-lg" onclick="camApply()">✅ 適用する</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1158,6 +1217,128 @@ function showToast(msg){
 
 function todayStr(){ return new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'); }
 function nowStr(){ return new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}); }
+
+/* ═══════════════════════════════════
+   CAMERA OCR
+═══════════════════════════════════ */
+let camNums = [];
+
+function openCamModal() {
+  camReset();
+  document.getElementById('camModal').classList.add('open');
+}
+
+function onCamFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const img = document.getElementById('camPreview');
+  img.src = url;
+  img.onload = () => {
+    document.getElementById('camS1').style.display = 'block';
+    document.getElementById('camS1').innerHTML = ''; // clear
+    document.getElementById('camS2').style.display = 'block';
+    document.getElementById('camStatus').textContent = '画像を読み込みました。「数字を読み取る」を押してください。';
+    document.getElementById('camS1').style.display = 'none';
+  };
+}
+
+async function camRunOCR() {
+  const btn    = document.getElementById('camOCRBtn');
+  const status = document.getElementById('camStatus');
+  btn.disabled = true;
+  btn.textContent = '読み取り中…';
+
+  try {
+    if (typeof Tesseract === 'undefined') {
+      status.textContent = '📥 OCRライブラリ読み込み中… (初回のみ10〜20秒)';
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    status.textContent = '🔍 数字を認識中…';
+
+    // 前処理: グレースケール + 閾値でLED表示を鮮明化
+    const img    = document.getElementById('camPreview');
+    const canvas = document.getElementById('camCanvas');
+    const ctx    = canvas.getContext('2d');
+    canvas.width  = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+    const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d  = id.data;
+    for (let i = 0; i < d.length; i += 4) {
+      const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+      const v = g > 110 ? 255 : 0;
+      d[i] = d[i+1] = d[i+2] = v;
+    }
+    ctx.putImageData(id, 0, 0);
+
+    // Tesseract OCR（数字のみ）
+    const { data } = await Tesseract.recognize(canvas, 'eng', {
+      tessedit_char_whitelist: '0123456789',
+      tessedit_pageseg_mode: '11',
+    });
+
+    const raw = (data.text.match(/\d+/g) || []).map(Number);
+    camNums = [...new Set(raw)].filter(n => n >= 1 && n <= 9999).slice(0, 12);
+    camShowResults();
+
+  } catch (err) {
+    status.textContent = '❌ 読み取り失敗: ' + err.message;
+    btn.disabled = false;
+    btn.textContent = '🔍 再試行';
+  }
+}
+
+function camShowResults() {
+  document.getElementById('camS2').style.display = 'none';
+  document.getElementById('camS3').style.display = 'block';
+  const el = document.getElementById('camResults');
+
+  if (!camNums.length) {
+    el.innerHTML = '<div style="color:var(--rd);text-align:center;padding:20px 0">数字を検出できませんでした。<br>もう少し近づいて撮影してください。</div>';
+    return;
+  }
+
+  el.innerHTML = camNums.map((n, i) => `
+    <div class="cam-assign">
+      <span class="cam-num">${n}</span>
+      <select id="cf${i}" class="cam-sel">
+        <option value="">— 使用しない —</option>
+        <option value="g">現在G数</option>
+        <option value="sc">SC回数（累計）</option>
+        <option value="sg">今日の総G数</option>
+      </select>
+    </div>`).join('');
+}
+
+function camApply() {
+  const applied = [];
+  camNums.forEach((n, i) => {
+    const v = document.getElementById('cf' + i)?.value;
+    if      (v === 'g')  { setG(n); applied.push('現在G:' + n); }
+    else if (v === 'sc') { S.scCount = n; applied.push('SC:' + n + '回'); }
+    else if (v === 'sg') { S.sessionG = n; applied.push('総G:' + n); }
+  });
+  if (applied.length) { syncInputs(); renderAll(); addLog('📷 カメラ読み取り適用: ' + applied.join(', ')); }
+  closeModal('camModal');
+}
+
+function camReset() {
+  document.getElementById('camS1').style.display = 'block';
+  document.getElementById('camS2').style.display = 'none';
+  document.getElementById('camS3').style.display = 'none';
+  const btn = document.getElementById('camOCRBtn');
+  if (btn) { btn.disabled = false; btn.textContent = '🔍 数字を読み取る'; }
+  const ci = document.getElementById('camInput');
+  if (ci) ci.value = '';
+  camNums = [];
+}
 </script>
 </body>
 </html>
