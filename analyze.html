@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>台評価・攻め時判定 | L獣王XZ</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0d1117;--card:#161b22;--c2:#1c2128;--bd:#30363d;--tx:#f0f6fc;--mu:#7d8590;--ye:#f0a83a;--gn:#3fb950;--rd:#f85149;--bl:#58a6ff;--pu:#bc8cff;--or:#ffa657}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica Neue',sans-serif;max-width:480px;margin:0 auto;font-size:14px}
+
+.hdr{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;gap:12px}
+.back{color:var(--bl);text-decoration:none;font-size:15px;font-weight:700}
+.hdr-title{font-size:15px;font-weight:700;color:var(--ye);flex:1}
+.page{padding:10px 10px 40px}
+
+.card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px}
+.ch{font-size:10px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+
+/* BIG INPUT */
+.inp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.inp-box label{font-size:11px;color:var(--mu);display:block;margin-bottom:4px}
+.inp-box input{width:100%;background:var(--c2);border:2px solid var(--bd);border-radius:8px;color:#fff;font-size:28px;font-weight:800;padding:8px 10px;text-align:center;-webkit-appearance:none;outline:none;transition:border-color .2s}
+.inp-box input:focus{border-color:var(--bl)}
+.inp-box input::placeholder{color:var(--bd);font-size:20px;font-weight:400}
+.inp-sub{font-size:10px;color:var(--mu);text-align:center;margin-top:3px}
+
+/* VERDICT */
+.verdict{text-align:center;padding:20px 14px;border-radius:12px;margin-bottom:10px}
+.verdict-icon{font-size:52px;line-height:1;margin-bottom:8px}
+.verdict-lbl{font-size:30px;font-weight:900;line-height:1;margin-bottom:6px}
+.verdict-sub{font-size:14px;line-height:1.6}
+.v-attack {background:linear-gradient(135deg,rgba(248,81,73,.2),rgba(248,81,73,.05));border:2px solid var(--rd)}
+.v-go     {background:linear-gradient(135deg,rgba(63,185,80,.2),rgba(63,185,80,.05));border:2px solid var(--gn)}
+.v-watch  {background:linear-gradient(135deg,rgba(240,168,58,.2),rgba(240,168,58,.05));border:2px solid var(--ye)}
+.v-stop   {background:linear-gradient(135deg,rgba(125,133,144,.15),rgba(125,133,144,.03));border:2px solid var(--bd)}
+
+/* SCORE BAR */
+.score-wrap{margin-bottom:10px}
+.score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.score-num{font-size:32px;font-weight:900}
+.score-label{font-size:12px;color:var(--mu)}
+.score-bg{background:var(--bd);border-radius:4px;height:10px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* METRICS GRID */
+.mg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.mg2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.mbox{background:var(--c2);border-radius:8px;padding:10px 6px;text-align:center}
+.mbox .ml{font-size:10px;color:var(--mu);margin-bottom:3px;line-height:1.3}
+.mbox .mv{font-size:20px;font-weight:800;line-height:1}
+.mbox .ms{font-size:10px;color:var(--mu);margin-top:2px}
+.mbox.good{border:1px solid var(--gn)}
+.mbox.warn{border:1px solid var(--ye)}
+.mbox.bad {border:1px solid var(--rd)}
+
+/* CEILING CALC */
+.ceil-box{background:var(--c2);border-radius:10px;padding:14px;margin-bottom:8px}
+.ceil-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bd);font-size:13px}
+.ceil-row:last-child{border-bottom:none}
+.ceil-key{color:var(--mu)}
+.ceil-val{font-weight:700}
+
+/* FACTOR BARS */
+.factor{margin-bottom:10px}
+.factor-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.factor-name{font-size:12px;color:var(--mu)}
+.factor-pts{font-size:12px;font-weight:700}
+.factor-bg{background:var(--bd);border-radius:3px;height:6px}
+.factor-fill{height:100%;border-radius:3px;background:var(--bl)}
+
+/* HISTORY INPUT */
+.hist-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.hist-cell{background:var(--c2);border-radius:6px;padding:6px 4px;text-align:center}
+.hist-cell label{font-size:9px;color:var(--mu);display:block;margin-bottom:2px}
+.hist-cell input{width:100%;background:transparent;border:none;color:#fff;font-size:16px;font-weight:700;text-align:center;outline:none;-webkit-appearance:none}
+
+/* SAVED LIST */
+.save-item{padding:10px;border-bottom:1px solid var(--bd);font-size:12px}
+.save-item:last-child{border-bottom:none}
+.save-head{display:flex;justify-content:space-between;margin-bottom:3px}
+.save-verdict{font-weight:700;font-size:13px}
+
+/* ADVICE */
+.adv{border-radius:10px;padding:12px 14px;border-left:5px solid;margin-bottom:8px}
+.adv-t{font-size:15px;font-weight:700;margin-bottom:4px}
+.adv-b{font-size:13px;line-height:1.65}
+.ared{background:rgba(127,29,29,.9);border-color:var(--rd)}
+.ayel{background:rgba(120,53,15,.85);border-color:var(--ye)}
+.agreen{background:rgba(6,58,29,.9);border-color:var(--gn)}
+.ablue{background:rgba(17,44,100,.9);border-color:var(--bl)}
+
+.btn{padding:12px 8px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;width:100%;margin-bottom:6px;transition:transform .1s,opacity .1s}
+.btn:active{transform:scale(.95);opacity:.8}
+.cgreen{background:#0f2818;color:var(--gn)}
+.cgray{background:#21262d;color:#8b949e}
+.cred{background:#2d0f0f;color:var(--rd)}
+
+.pos{color:var(--gn)} .neg{color:var(--rd)} .tye{color:var(--ye)} .tbl{color:var(--bl)} .tpu{color:var(--pu)} .bold{font-weight:700}
+hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="index.html" class="back">← 戻る</a>
+  <div class="hdr-title">🎯 台評価・攻め時判定</div>
+</div>
+
+<div class="page">
+
+<!-- ① 台データ入力 -->
+<div class="card">
+  <div class="ch">台のデータ表示から入力</div>
+  <div class="inp-grid">
+    <div class="inp-box">
+      <label>ART突入 (今日)</label>
+      <input type="number" inputmode="numeric" id="iArt" placeholder="44" min="0" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">上部表示の「ART突入」</div>
+    </div>
+    <div class="inp-box">
+      <label>RB突入 (今日)</label>
+      <input type="number" inputmode="numeric" id="iRb" placeholder="7" min="0" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">「RB」の回数</div>
+    </div>
+  </div>
+  <div class="inp-grid">
+    <div class="inp-box">
+      <label>現在のG数</label>
+      <input type="number" inputmode="numeric" id="iCurG" placeholder="996" min="0" max="999" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">「ゲーム」の回数</div>
+    </div>
+    <div class="inp-box">
+      <label>累計G数</label>
+      <input type="number" inputmode="numeric" id="iTotalG" placeholder="5963" min="0" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">「累計」の回数</div>
+    </div>
+  </div>
+  <div class="inp-grid">
+    <div class="inp-box">
+      <label>総ARTゲーム</label>
+      <input type="number" inputmode="numeric" id="iArtG" placeholder="769" min="0" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">「総ARTゲーム」</div>
+    </div>
+    <div class="inp-box">
+      <label>最高連続</label>
+      <input type="number" inputmode="numeric" id="iMaxRen" placeholder="5" min="0" max="99" oninput="analyze()" onfocus="this.select()">
+      <div class="inp-sub">最大「連」の数字</div>
+    </div>
+  </div>
+
+  <!-- ボーナス履歴（前回G数） -->
+  <div class="ch" style="margin-top:10px">直前ボーナス履歴 G数（任意）</div>
+  <div class="hist-row">
+    <div class="hist-cell"><label>1回前G</label><input type="number" inputmode="numeric" id="h1" placeholder="2" oninput="analyze()"></div>
+    <div class="hist-cell"><label>2回前G</label><input type="number" inputmode="numeric" id="h2" placeholder="22" oninput="analyze()"></div>
+    <div class="hist-cell"><label>3回前G</label><input type="number" inputmode="numeric" id="h3" placeholder="142" oninput="analyze()"></div>
+  </div>
+</div>
+
+<!-- ② 総合判定 -->
+<div class="verdict v-watch" id="verdictBox">
+  <div class="verdict-icon">📊</div>
+  <div class="verdict-lbl">データを入力</div>
+  <div class="verdict-sub">上のフォームに台のデータを入力してください</div>
+</div>
+
+<!-- ③ スコア詳細 -->
+<div class="card" id="scoreCard" style="display:none">
+  <div class="ch">総合スコア</div>
+  <div class="score-wrap">
+    <div class="score-row">
+      <span class="score-num" id="scoreNum">0</span>
+      <span class="score-label">/ 100点</span>
+    </div>
+    <div class="score-bg"><div class="score-fill" id="scoreFill" style="width:0%"></div></div>
+  </div>
+  <div id="factorList"></div>
+</div>
+
+<!-- ④ 天井投資計算 -->
+<div class="card" id="ceilCard" style="display:none">
+  <div class="ch">天井投資計算</div>
+  <div class="ceil-box" id="ceilBox"></div>
+</div>
+
+<!-- ⑤ 台の指標分析 -->
+<div class="card" id="metricsCard" style="display:none">
+  <div class="ch">台の指標分析</div>
+  <div class="mg3" id="metricsGrid"></div>
+  <div id="metricsAdvice"></div>
+</div>
+
+<!-- ⑥ ボーナス履歴の評価 -->
+<div class="card" id="histCard" style="display:none">
+  <div class="ch">ボーナス履歴の評価</div>
+  <div id="histAnalysis"></div>
+</div>
+
+<!-- ⑦ 攻め/やめ 根拠 -->
+<div class="card" id="reasonCard" style="display:none">
+  <div class="ch">判定根拠</div>
+  <div id="reasonList"></div>
+</div>
+
+<!-- ⑧ 保存・履歴 -->
+<div class="card">
+  <div class="ch">この分析を保存</div>
+  <button class="btn cgreen" id="saveBtn" onclick="saveAnalysis()" disabled>💾 分析結果を保存する</button>
+  <div id="savedList"></div>
+</div>
+
+</div><!-- /page -->
+
+<script>
+/* ─────────────────────────
+   STORAGE
+───────────────────────── */
+const STORE_KEY = 'juuou_analyze_v1';
+function getSaved()  { try{return JSON.parse(localStorage.getItem(STORE_KEY))||[];}catch{return[];} }
+function putSaved(a) { localStorage.setItem(STORE_KEY, JSON.stringify(a)); }
+
+/* ─────────────────────────
+   CONSTANTS
+───────────────────────── */
+const CEIL_N = 999;
+const CPG_20 = 1000/31.8; // 円/G (20円スロット)
+
+/* ─────────────────────────
+   READ INPUTS
+───────────────────────── */
+function vals() {
+  return {
+    art:    parseInt(document.getElementById('iArt').value)||0,
+    rb:     parseInt(document.getElementById('iRb').value)||0,
+    curG:   parseInt(document.getElementById('iCurG').value)||0,
+    totalG: parseInt(document.getElementById('iTotalG').value)||0,
+    artG:   parseInt(document.getElementById('iArtG').value)||0,
+    maxRen: parseInt(document.getElementById('iMaxRen').value)||0,
+    h: [1,2,3].map(i => parseInt(document.getElementById('h'+i).value)||null),
+  };
+}
+
+/* ─────────────────────────
+   MAIN ANALYSIS
+───────────────────────── */
+function analyze() {
+  const v = vals();
+  if (!v.art && !v.curG && !v.totalG) return;
+
+  // ── 指標計算 ──
+  const normalG  = v.totalG > 0 && v.artG > 0 ? v.totalG - v.artG : v.totalG;
+  const artRate  = (v.art > 0 && normalG > 0) ? Math.round(normalG / v.art) : null;
+  const rbRate   = (v.rb > 0 && v.totalG > 0) ? Math.round(v.totalG / v.rb) : null;
+  const rbRatio  = (v.art > 0 && v.rb > 0)    ? Math.round(v.rb / v.art * 100) : null;
+  const artGRatio= (v.totalG > 0 && v.artG > 0)? Math.round(v.artG / v.totalG * 100) : null;
+  const remG     = Math.max(0, CEIL_N - v.curG);
+  const ceilCost = Math.round(remG * CPG_20 / 100) * 100;
+
+  // ── スコア計算 ──
+  let score = 0, factors = [];
+
+  // 1. 現在G数スコア (0-35点)
+  let gPts = 0;
+  if      (v.curG >= 950) gPts = 35;
+  else if (v.curG >= 850) gPts = 30;
+  else if (v.curG >= 700) gPts = 22;
+  else if (v.curG >= 500) gPts = 14;
+  else if (v.curG >= 300) gPts = 7;
+  else if (v.curG >= 100) gPts = 3;
+  const gLabel = v.curG >= 950 ? '天井確定ゾーン' :
+                 v.curG >= 700 ? '天井圏（期待値プラス）' :
+                 v.curG >= 300 ? '中間' : '序盤';
+  factors.push({name:'現在G数 '+v.curG+'G ('+gLabel+')', pts:gPts, max:35});
+  score += gPts;
+
+  // 2. ART確率スコア (0-30点)
+  let aPts = 0;
+  if (artRate !== null) {
+    if      (artRate <= 95)  aPts = 30;
+    else if (artRate <= 105) aPts = 25;
+    else if (artRate <= 120) aPts = 18;
+    else if (artRate <= 135) aPts = 12;
+    else if (artRate <= 150) aPts = 6;
+    else                     aPts = 2;
+  }
+  factors.push({name:'ART確率 '+(artRate?'1/'+artRate:'—')+ '（サバ連含む）', pts:aPts, max:30});
+  score += aPts;
+
+  // 3. RB比率スコア (0-20点)
+  let rPts = 0;
+  if (rbRatio !== null) {
+    if      (rbRatio >= 20) rPts = 20;
+    else if (rbRatio >= 15) rPts = 15;
+    else if (rbRatio >= 10) rPts = 10;
+    else if (rbRatio >= 5)  rPts = 5;
+  }
+  factors.push({name:'RB比率 '+(rbRatio !== null ? rbRatio+'%（超サバ率）' : '—'), pts:rPts, max:20});
+  score += rPts;
+
+  // 4. 最高連続スコア (0-15点)
+  let renPts = 0;
+  if      (v.maxRen >= 5) renPts = 15;
+  else if (v.maxRen >= 4) renPts = 10;
+  else if (v.maxRen >= 3) renPts = 5;
+  factors.push({name:'最高連続 '+v.maxRen+'連', pts:renPts, max:15});
+  score += renPts;
+
+  // ── 判定 ──
+  const verdict = buildVerdict(score, v, artRate, remG, rbRatio);
+
+  // ── 描画 ──
+  renderVerdict(verdict, score);
+  renderScore(score, factors);
+  renderCeil(v.curG, remG, ceilCost);
+  renderMetrics(artRate, rbRate, rbRatio, artGRatio, v);
+  renderHistAnalysis(v.h);
+  renderReasons(verdict.reasons);
+
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('scoreCard').style.display = '';
+  document.getElementById('ceilCard').style.display = '';
+  document.getElementById('metricsCard').style.display = '';
+  document.getElementById('reasonCard').style.display = '';
+
+  // 保存用にグローバルへ
+  window._lastAnalysis = {
+    time: new Date().toLocaleString('ja-JP',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}),
+    score, verdict: verdict.lbl, artRate, rbRatio, curG: v.curG, art: v.art, rb: v.rb,
+  };
+
+  renderSaved();
+}
+
+function buildVerdict(score, v, artRate, remG, rbRatio) {
+  const reasons = [];
+  let cls, icon, lbl, sub;
+
+  // 天井直前は絶対攻め
+  if (v.curG >= 950) {
+    cls = 'v-attack'; icon = '🔥'; lbl = '全力攻め！';
+    sub = `天井まであと${remG}G！今すぐ座るべき！`;
+    reasons.push({type:'good', text:`現在${v.curG}G — 天井(999G)まであと${remG}Gで確実にボーナスが来ます`});
+  } else if (score >= 65) {
+    cls = 'v-attack'; icon = '🔥'; lbl = '攻め時';
+    sub = '総合評価が高い。積極的に投資を推奨。';
+  } else if (score >= 45) {
+    cls = 'v-go'; icon = '✅'; lbl = '続行推奨';
+    sub = '条件は良い方向。続けて様子を見ましょう。';
+  } else if (score >= 25) {
+    cls = 'v-watch'; icon = '👀'; lbl = '様子見';
+    sub = '積極的に投資するほどではない。慎重に。';
+  } else {
+    cls = 'v-stop'; icon = '⛔'; lbl = 'やめ時';
+    sub = '台の状況が良くない。やめを検討。';
+  }
+
+  // 根拠を自動生成
+  if (v.curG >= 700) reasons.push({type:'good', text:`現在${v.curG}G → 天井期待値がプラス圏。投資する価値あり`});
+  if (artRate !== null && artRate <= 110) reasons.push({type:'good', text:`ART確率 1/${artRate} → 非常に好調。高設定 or 爆発台の可能性`});
+  if (artRate !== null && artRate >= 150) reasons.push({type:'bad',  text:`ART確率 1/${artRate} → やや低調。様子を見た方が無難`});
+  if (rbRatio !== null && rbRatio >= 15) reasons.push({type:'good', text:`RB比率 ${rbRatio}% → 超サバ到達が多い。この台は出玉が取れる台`});
+  if (rbRatio !== null && rbRatio <= 5 && v.art > 10) reasons.push({type:'bad', text:`RB比率 ${rbRatio}% → 超サバ到達が少ない。連続が伸びにくい可能性`});
+  if (v.maxRen >= 5) reasons.push({type:'good', text:`最高${v.maxRen}連を達成済み。超サバ到達実績あり`});
+  if (v.rb > 0) reasons.push({type:'good', text:`RBを${v.rb}回引いている → 超サバストック獲得済みの可能性あり`});
+
+  return {cls, icon, lbl, sub, reasons};
+}
+
+/* ─────────────────────────
+   RENDER
+───────────────────────── */
+function renderVerdict(v, score) {
+  const el = document.getElementById('verdictBox');
+  el.className = 'verdict ' + v.cls;
+  el.innerHTML = `
+    <div class="verdict-icon">${v.icon}</div>
+    <div class="verdict-lbl">${v.lbl}</div>
+    <div class="verdict-sub">${v.sub}</div>
+  `;
+}
+
+function renderScore(score, factors) {
+  const numEl   = document.getElementById('scoreNum');
+  const fillEl  = document.getElementById('scoreFill');
+  const listEl  = document.getElementById('factorList');
+  numEl.textContent = score;
+  numEl.style.color = score >= 65 ? 'var(--rd)' : score >= 45 ? 'var(--gn)' : score >= 25 ? 'var(--ye)' : 'var(--mu)';
+  fillEl.style.width = score + '%';
+  fillEl.style.background = score >= 65 ? 'var(--rd)' : score >= 45 ? 'var(--gn)' : score >= 25 ? 'var(--ye)' : 'var(--mu)';
+
+  listEl.innerHTML = factors.map(f => `
+    <div class="factor">
+      <div class="factor-row">
+        <span class="factor-name">${f.name}</span>
+        <span class="factor-pts" style="color:${f.pts/f.max>=.7?'var(--gn)':f.pts/f.max>=.4?'var(--ye)':'var(--mu)'}">${f.pts}/${f.max}点</span>
+      </div>
+      <div class="factor-bg"><div class="factor-fill" style="width:${f.pts/f.max*100}%;background:${f.pts/f.max>=.7?'var(--gn)':f.pts/f.max>=.4?'var(--ye)':'var(--bd)'}"></div></div>
+    </div>`).join('');
+}
+
+function renderCeil(curG, remG, cost) {
+  const el = document.getElementById('ceilBox');
+  const isZone = remG <= 10;
+  const isNear = remG <= 50;
+
+  el.innerHTML = `
+    <div class="ceil-row"><span class="ceil-key">現在G数</span><span class="ceil-val" style="color:${curG>=900?'var(--rd)':'var(--tx)'}">${curG}G</span></div>
+    <div class="ceil-row"><span class="ceil-key">天井まで</span><span class="ceil-val" style="color:${isZone?'var(--rd)':isNear?'var(--ye)':'var(--tx)'}">${remG}G</span></div>
+    <div class="ceil-row"><span class="ceil-key">天井までのコスト</span><span class="ceil-val tye">≈${cost.toLocaleString()}円</span></div>
+    <div class="ceil-row"><span class="ceil-key">天井恩恵</span><span class="ceil-val">SC or BIG or REG確定</span></div>
+    <div class="ceil-row" style="border-bottom:none"><span class="ceil-key">期待枚数（目安）</span>
+      <span class="ceil-val">${remG<=100?'単発〜サバ連 150〜800枚+':'—'}</span></div>
+    ${isZone?'<div style="text-align:center;margin-top:8px;font-size:14px;font-weight:700;color:var(--rd)">🔥 天井発動ゾーン！今すぐ座れ！</div>':''}
+    ${!isZone&&isNear?'<div style="text-align:center;margin-top:8px;font-size:13px;font-weight:700;color:var(--ye)">⚠️ 天井圏！座る価値あり</div>':''}
+  `;
+}
+
+function renderMetrics(artRate, rbRate, rbRatio, artGRatio, v) {
+  const grid = document.getElementById('metricsGrid');
+  const adv  = document.getElementById('metricsAdvice');
+
+  function mbox(lbl, val, sub, grade) {
+    const cls = grade==='good'?'good':grade==='warn'?'warn':grade==='bad'?'bad':'';
+    return `<div class="mbox ${cls}"><div class="ml">${lbl}</div><div class="mv">${val}</div><div class="ms">${sub}</div></div>`;
+  }
+
+  const artG = artRate ? artRate : '—';
+  const artCls = artRate ? (artRate<=110?'good':artRate<=135?'':artRate<=160?'warn':'bad') : '';
+  const rbR = rbRatio !== null ? rbRatio + '%' : '—';
+  const rbCls = rbRatio!==null ? (rbRatio>=15?'good':rbRatio>=10?'':rbRatio>=5?'warn':'bad') : '';
+  const artGR = artGRatio !== null ? artGRatio + '%' : '—';
+
+  grid.innerHTML =
+    mbox('ART確率', artRate?'1/'+artRate:'—', '(サバ連含む)', artCls) +
+    mbox('RB比率', rbR, '超サバ率', rbCls) +
+    mbox('ARTゲーム率', artGR, 'AT中消化割合', artGRatio?artGRatio>=15?'good':artGRatio>=10?'':'bad':'');
+
+  // 設定推定コメント
+  let advHtml = '';
+  if (artRate) {
+    const setting = artRate<=95?'爆発台（高設定期）':artRate<=115?'高設定/好調台の可能性':artRate<=135?'中間（設定2〜4相当）':'低設定または不調台';
+    const note = '※ART確率の表示はサバ連を含むため、理論値(1/279〜1/326)とは直接比較できません';
+    advHtml = `<div class="adv ${artRate<=115?'agreen':artRate<=135?'ayel':'ared'}" style="margin-top:0">
+      <div class="adv-t">ART確率からの台評価</div>
+      <div class="adv-b">1/${artRate} → <strong>${setting}</strong><br><span style="font-size:11px;color:rgba(255,255,255,.6)">${note}</span></div>
+    </div>`;
+  }
+  if (rbRatio !== null) {
+    const rbNote = rbRatio>=15?'RB比率が高い → 超サバ達成が多い好調台！':rbRatio>=10?'RB比率は標準的':'RB比率が低め → 超サバ到達が少ない';
+    advHtml += `<div class="adv ${rbRatio>=15?'agreen':rbRatio>=10?'ablue':'ayel'}">
+      <div class="adv-t">RB(超サバ)比率 ${rbRatio}%</div>
+      <div class="adv-b">${rbNote}</div>
+    </div>`;
+  }
+  adv.innerHTML = advHtml;
+}
+
+function renderHistAnalysis(h) {
+  const el = document.getElementById('histCard');
+  const known = h.filter(v => v !== null);
+  if (!known.length) { el.style.display = 'none'; return; }
+  el.style.display = '';
+
+  const inner = document.getElementById('histAnalysis') || (() => {
+    const d = document.createElement('div'); d.id='histAnalysis';
+    document.getElementById('histCard').appendChild(d); return d;
+  })();
+
+  let html = '';
+  known.forEach((g, i) => {
+    const isSabaRen = g !== null && g <= 30;
+    const isMid     = g !== null && g > 30 && g <= 200;
+    const isLong    = g !== null && g > 200;
+    const label = isSabaRen ? `${g}G — 潜伏継続（サバ連！）` :
+                  isMid     ? `${g}G — 通常当選` :
+                  isLong    ? `${g}G — 長回し後当選` : `${g}G`;
+    const color = isSabaRen ? 'var(--gn)' : isMid ? 'var(--tx)' : 'var(--ye)';
+    html += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <span style="min-width:24px;font-size:11px;color:var(--mu)">${i+1}回前</span>
+      <span style="font-size:16px;font-weight:700;color:${color}">${label}</span>
+      ${isSabaRen?'<span style="font-size:11px;background:#0f2818;color:var(--gn);padding:2px 6px;border-radius:10px">サバ連</span>':''}
+    </div>`;
+  });
+
+  const sabaCount = known.filter(g => g !== null && g <= 30).length;
+  const summary = sabaCount > 0
+    ? `<div class="adv agreen" style="margin-top:8px"><div class="adv-t">✅ サバ連${sabaCount}件確認</div><div class="adv-b">最近のボーナス履歴にサバ連あり。この台は連続が出る台です。</div></div>`
+    : known.some(g => g > 300)
+    ? `<div class="adv ayel" style="margin-top:8px"><div class="adv-t">⚠️ 最近は長回し</div><div class="adv-b">前回ボーナスまで${Math.max(...known)}Gと長い。現在G数と合わせて判断。</div></div>`
+    : '';
+
+  document.getElementById('histAnalysis').innerHTML = html + summary;
+}
+
+function renderReasons(reasons) {
+  if (!reasons.length) return;
+  document.getElementById('reasonList').innerHTML = reasons.map(r =>
+    `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px;line-height:1.5">
+      <span>${r.type==='good'?'✅':'⚠️'}</span>
+      <span style="color:${r.type==='good'?'var(--gn)':'var(--ye)'}">${r.text}</span>
+    </div>`).join('');
+}
+
+/* ─────────────────────────
+   SAVE / LOAD
+───────────────────────── */
+function saveAnalysis() {
+  if (!window._lastAnalysis) return;
+  const arr = getSaved();
+  arr.unshift(window._lastAnalysis);
+  if (arr.length > 30) arr.splice(30);
+  putSaved(arr);
+  renderSaved();
+  document.getElementById('saveBtn').textContent = '✅ 保存しました';
+  setTimeout(() => document.getElementById('saveBtn').textContent = '💾 分析結果を保存する', 2000);
+}
+
+function renderSaved() {
+  const arr = getSaved();
+  const el  = document.getElementById('savedList');
+  if (!arr.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = `<hr class="dv"><div class="ch">保存済みの分析</div>` + arr.map(a => {
+    const vcls = a.score>=65?'var(--rd)':a.score>=45?'var(--gn)':a.score>=25?'var(--ye)':'var(--mu)';
+    return `<div class="save-item">
+      <div class="save-head">
+        <span style="color:var(--mu)">${a.time}</span>
+        <span class="save-verdict" style="color:${vcls}">${a.verdict} (${a.score}点)</span>
+      </div>
+      <div style="font-size:11px;color:var(--mu)">
+        ART:${a.art}回 RB:${a.rb}回 G:${a.curG}G | ART確率:${a.artRate?'1/'+a.artRate:'—'} | RB比率:${a.rbRatio!==null?a.rbRatio+'%':'—'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────
+   INIT
+───────────────────────── */
+window.addEventListener('load', () => {
+  renderSaved();
+  // メインページから現在G数を引き継ぐ
+  try {
+    const cur = JSON.parse(localStorage.getItem('juuou_cur_v3'));
+    if (cur && cur.g) document.getElementById('iCurG').value = cur.g;
+    if (cur && cur.scCount) document.getElementById('iArt').value = cur.scCount;
+    if (cur && cur.sessionG) document.getElementById('iTotalG').value = cur.sessionG;
+    if (cur && cur.sabaRen) document.getElementById('iMaxRen').value = cur.sabaRen;
+    analyze();
+  } catch(e){}
+});
+</script>
+</body>
+</html>
