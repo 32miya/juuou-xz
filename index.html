@@ -472,17 +472,57 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 
   <!-- BB攻略 -->
   <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ BB(ビッグボーナス)中の攻略 — 15G継続</div>
-  <div style="background:rgba(248,81,73,.15);border:1px solid var(--rd);border-radius:10px;padding:12px;margin-bottom:8px">
-    <div style="font-size:14px;font-weight:800;color:var(--rd);margin-bottom:8px">⚠️ ダチョウ揃いの打ち方</div>
-    <div style="font-size:13px;line-height:1.8">
-      <strong>① カットイン発生時だけ有効！</strong><br>
-      カットインなし = ダチョウは揃わない（普通に打つ）<br><br>
+  <div style="background:rgba(248,81,73,.15);border:2px solid var(--rd);border-radius:10px;padding:12px;margin-bottom:8px">
+    <div style="font-size:14px;font-weight:800;color:var(--rd);margin-bottom:8px">⚠️ ダチョウ揃いの正しい打ち方</div>
+    <div style="font-size:13px;line-height:1.9">
+      <strong>① カットイン発生時だけ有効</strong><br>
+      カットインなし = 普通に打つ（狙っても無意味）<br><br>
       <strong>② 必ず逆押し（右→中→左）</strong><br>
-      <span style="background:var(--c2);padding:2px 8px;border-radius:6px;font-size:12px">右リール → 中リール → 左リール</span><br>
-      ※通常の左→中→右では<span style="color:var(--rd)">絶対に揃いません</span><br><br>
-      <strong>③ 右リール下段にダチョウを狙う</strong><br>
-      下段停止でダチョウ揃い濃厚 → ストック獲得！
+      <span style="background:var(--c2);padding:2px 8px;border-radius:6px">右 → 中 → 左</span>　通常押しでは絶対不可<br><br>
+      <strong style="color:var(--ye)">③ 右リールは「下段」にダチョウを止める ← 最重要！</strong>
     </div>
+    <!-- リール停止図 -->
+    <div style="margin:10px 0;font-size:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;margin-bottom:4px">
+        <div style="color:var(--mu)">右リール</div>
+        <div style="color:var(--mu)">中リール</div>
+        <div style="color:var(--mu)">左リール</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">上段</div>
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">中段</div>
+          <div style="background:rgba(248,81,73,.3);border-radius:4px;padding:2px 0">
+            <span style="font-size:11px;font-weight:700;color:var(--rd)">下段 🐦</span>
+          </div>
+        </div>
+        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+        </div>
+        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;line-height:1.7;color:#e5e7eb">
+      右リール下段にダチョウ → そのまま中・左と押す → <strong style="color:var(--gn)">ダチョウ揃い濃厚！</strong><br><br>
+      <strong style="color:var(--ye)">❗「中段」に止めていると揃いません（1コマズレ）</strong><br>
+      ボタンを今より少し遅く押してダチョウを下段に落とす
+    </div>
+  </div>
+
+  <!-- 内部成立の解説 -->
+  <div style="background:var(--c2);border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;line-height:1.7">
+    <strong style="color:var(--ye)">📌 カットインが来ても揃わないことがある理由</strong><br>
+    スマスロは内部抽選でダチョウ揃いが決まります。<br>
+    ・内部成立 → 正しく止めれば揃う（機械が補助）<br>
+    ・内部非成立 → どんな止め方をしても揃わない<br>
+    カットインは「チャンス演出」であり100%の保証ではありません。<br>
+    <strong>「何度来ても揃わない」= 内部非成立のカットインが続いている</strong>
   </div>
   <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.8;margin-bottom:8px">
     <strong>ループストック抽選（160枚以上獲得で突入: 11.1%）</strong><br>
