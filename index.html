@@ -104,6 +104,14 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 .lat-num{font-size:46px;font-weight:900;color:#a78bfa;line-height:1;cursor:pointer;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:8px 14px;text-align:center;min-width:90px}
 .lat-num:active{background:var(--c2)}
 
+/* ACCORDION */
+.acc-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--c2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;-webkit-tap-highlight-color:transparent;user-select:none;border:1px solid var(--bd)}
+.acc-hd:active{opacity:.7}
+.acc-arrow{font-size:11px;color:var(--mu);transition:transform .2s;flex-shrink:0;display:inline-block}
+.acc-hd.open{background:#1c2128;border-color:var(--ye)}
+.acc-hd.open .acc-arrow{transform:rotate(90deg);color:var(--ye)}
+.acc-body{padding:0 2px 8px;overflow:hidden}
+
 /* SC MODE BUTTONS */
 .scm-btn{padding:10px 4px;border-radius:10px;cursor:pointer;display:block;text-align:center;width:100%;border:2px solid transparent;-webkit-tap-highlight-color:transparent;user-select:none;transition:transform .1s,box-shadow .2s}
 .scm-btn:active{transform:scale(.93);opacity:.75}
@@ -504,222 +512,151 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 <div class="card">
   <div class="ch">BB/RB打ち方 ＆ 演出の意味</div>
 
-  <!-- 背景演出 -->
-  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ 背景演出 — 台の状態を読む</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-    <div style="background:#0d1a0d;border:2px solid var(--gn);border-radius:10px;padding:12px;text-align:center">
-      <div style="font-size:22px">🌿</div>
-      <div style="font-size:13px;font-weight:800;color:var(--gn);margin:4px 0">昼（グリーン）</div>
-      <div style="font-size:11px;color:var(--mu)">通常状態<br>SC高確移行なし<br><strong style="color:var(--rd)">ハマり継続の可能性</strong></div>
-    </div>
-    <div style="background:#1a1200;border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center">
-      <div style="font-size:22px">🌅</div>
-      <div style="font-size:13px;font-weight:800;color:var(--or);margin:4px 0">夕方（オレンジ）</div>
-      <div style="font-size:11px;color:var(--mu)">SC高確示唆！<br>次のSC当選に期待<br><strong style="color:var(--gn)">継続強く推奨</strong></div>
+  <!-- 1: 背景演出 -->
+  <div class="acc-hd" onclick="toggleAcc(this)">
+    <span class="acc-arrow">▶</span>🌿 背景演出 — 台の状態を読む
+  </div>
+  <div class="acc-body" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
+      <div style="background:#0d1a0d;border:2px solid var(--gn);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px">🌿</div>
+        <div style="font-size:13px;font-weight:800;color:var(--gn);margin:4px 0">昼（グリーン）</div>
+        <div style="font-size:11px;color:var(--mu)">通常状態<br>SC高確移行なし<br><strong style="color:var(--rd)">ハマり継続の可能性</strong></div>
+      </div>
+      <div style="background:#1a1200;border:2px solid var(--or);border-radius:10px;padding:12px;text-align:center">
+        <div style="font-size:22px">🌅</div>
+        <div style="font-size:13px;font-weight:800;color:var(--or);margin:4px 0">夕方（オレンジ）</div>
+        <div style="font-size:11px;color:var(--mu)">SC高確示唆！<br>次のSC当選に期待<br><strong style="color:var(--gn)">継続強く推奨</strong></div>
+      </div>
     </div>
   </div>
 
-  <!-- BB攻略 -->
-  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ BB(ビッグボーナス)中の攻略 — 15G継続</div>
-  <div style="background:rgba(248,81,73,.15);border:2px solid var(--rd);border-radius:10px;padding:12px;margin-bottom:8px">
-    <div style="font-size:14px;font-weight:800;color:var(--rd);margin-bottom:8px">⚠️ ダチョウ揃いの正しい打ち方</div>
-    <div style="font-size:13px;line-height:1.9">
-      <strong>① カットイン発生時だけ有効</strong><br>
-      カットインなし = 普通に打つ（狙っても無意味）<br><br>
-      <strong>② 必ず逆押し（右→中→左）</strong><br>
-      <span style="background:var(--c2);padding:2px 8px;border-radius:6px">右 → 中 → 左</span>　通常押しでは絶対不可<br><br>
-      <strong style="color:var(--ye)">③ 右リールは「下段」にダチョウを止める ← 最重要！</strong>
-    </div>
-    <!-- リール停止図 -->
-    <div style="margin:10px 0;font-size:12px">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;margin-bottom:4px">
-        <div style="color:var(--mu)">右リール</div>
-        <div style="color:var(--mu)">中リール</div>
-        <div style="color:var(--mu)">左リール</div>
+  <!-- 2: BB攻略 -->
+  <div class="acc-hd" onclick="toggleAcc(this)">
+    <span class="acc-arrow">▶</span>🎰 BB中の攻略 — 15G継続・ダチョウ狙い
+  </div>
+  <div class="acc-body" style="display:none">
+    <div style="background:rgba(248,81,73,.15);border:2px solid var(--rd);border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="font-size:14px;font-weight:800;color:var(--rd);margin-bottom:8px">⚠️ ダチョウ揃いの正しい打ち方</div>
+      <div style="font-size:13px;line-height:1.9">
+        <strong>① カットイン発生時だけ有効</strong><br>
+        カットインなし = 普通に打つ（狙っても無意味）<br><br>
+        <strong>② 必ず逆押し（右→中→左）</strong><br>
+        <span style="background:var(--c2);padding:2px 8px;border-radius:6px">右 → 中 → 左</span>　通常押しでは絶対不可<br><br>
+        <strong style="color:var(--ye)">③ 右リールは「下段」にダチョウを止める ← 最重要！</strong>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
-        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">上段</div>
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">中段</div>
-          <div style="background:rgba(248,81,73,.3);border-radius:4px;padding:2px 0">
-            <span style="font-size:11px;font-weight:700;color:var(--rd)">下段 🐦</span>
+      <div style="margin:10px 0;font-size:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center;margin-bottom:4px">
+          <div style="color:var(--mu)">右リール</div><div style="color:var(--mu)">中リール</div><div style="color:var(--mu)">左リール</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+          <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+            <div style="color:var(--mu);font-size:10px;padding:2px 0">上段</div>
+            <div style="color:var(--mu);font-size:10px;padding:2px 0">中段</div>
+            <div style="background:rgba(248,81,73,.3);border-radius:4px;padding:2px 0"><span style="font-size:11px;font-weight:700;color:var(--rd)">下段 🐦</span></div>
+          </div>
+          <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+            <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div><div style="color:var(--mu);font-size:10px;padding:2px 0">…</div><div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
+          </div>
+          <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
+            <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div><div style="color:var(--mu);font-size:10px;padding:2px 0">…</div><div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
           </div>
         </div>
-        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-        </div>
-        <div style="background:#1a0a0a;border:1px solid var(--bd);border-radius:6px;padding:4px">
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-          <div style="color:var(--mu);font-size:10px;padding:2px 0">…</div>
-        </div>
+      </div>
+      <div style="font-size:12px;line-height:1.7;color:#e5e7eb">
+        右リール下段にダチョウ → そのまま中・左と押す → <strong style="color:var(--gn)">ダチョウ揃い濃厚！</strong><br><br>
+        <strong style="color:var(--ye)">❗「中段」に止めていると揃いません（1コマズレ）</strong>
       </div>
     </div>
-    <div style="font-size:12px;line-height:1.7;color:#e5e7eb">
-      右リール下段にダチョウ → そのまま中・左と押す → <strong style="color:var(--gn)">ダチョウ揃い濃厚！</strong><br><br>
-      <strong style="color:var(--ye)">❗「中段」に止めていると揃いません（1コマズレ）</strong><br>
-      ボタンを今より少し遅く押してダチョウを下段に落とす
+    <div style="background:var(--c2);border-radius:8px;padding:12px;margin-bottom:8px;font-size:13px;line-height:1.8">
+      <strong style="color:var(--ye)">📌 引き込み（滑り）とダチョウ揃いの仕組み</strong><br><br>
+      <div style="border-left:3px solid var(--gn);padding-left:8px;margin:6px 0">
+        <strong style="color:var(--gn)">内部成立している時</strong> → 機械が自動で引き込んで揃わせる
+      </div>
+      <div style="border-left:3px solid var(--rd);padding-left:8px;margin:6px 0">
+        <strong style="color:var(--rd)">内部非成立の時</strong> → 何をしても絶対に揃わない
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-top:6px">カットイン=濃厚演出（外れあり）。逆押しで打てていれば打ち方は正しい。</div>
+    </div>
+    <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.8">
+      <strong>ループストック抽選（160枚以上獲得で突入: 11.1%）</strong>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px;text-align:center">
+        <div style="background:#1a1a1a;border-radius:4px;padding:4px"><div style="font-size:10px;color:var(--mu)">1%</div><div style="font-size:13px;font-weight:700;color:var(--mu)">16.4%</div></div>
+        <div style="background:#1a1a1a;border-radius:4px;padding:4px"><div style="font-size:10px;color:var(--mu)">25%</div><div style="font-size:13px;font-weight:700;color:var(--bl)">16.4%</div></div>
+        <div style="background:#1a1a1a;border-radius:4px;padding:4px"><div style="font-size:10px;color:var(--mu)">50%</div><div style="font-size:13px;font-weight:700;color:var(--ye)">32.8%</div></div>
+        <div style="background:#1a1a1a;border-radius:4px;padding:4px"><div style="font-size:10px;color:var(--mu)">66%</div><div style="font-size:13px;font-weight:700;color:var(--or)">32.8%</div></div>
+        <div style="background:#1a1a1a;border-radius:4px;padding:4px"><div style="font-size:10px;color:var(--mu)">80%</div><div style="font-size:13px;font-weight:700;color:var(--rd)">1.6%</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">約3回に2回は50%以上のループ率が選択される</div>
     </div>
   </div>
 
-  <!-- 引き込みと内部成立の正確な説明 -->
-  <div style="background:var(--c2);border-radius:8px;padding:12px;margin-bottom:8px;font-size:13px;line-height:1.8">
-    <strong style="color:var(--ye)">📌 スマスロの引き込み（滑り）とダチョウ揃いの仕組み</strong><br>
-    <br>
-    スマスロには<strong>引き込み機能</strong>があります（最大4コマ相当）。<br>
-    中段 → 下段はわずか1コマ差 → 引き込み範囲内です。<br>
-    <br>
-    <div style="border-left:3px solid var(--gn);padding-left:8px;margin:6px 0">
-      <strong style="color:var(--gn)">内部成立している時</strong><br>
-      → 機械が自動で引き込んでダチョウを揃わせる<br>
-      → 押した位置（中段でも）関係なく揃う
-    </div>
-    <div style="border-left:3px solid var(--rd);padding-left:8px;margin:6px 0">
-      <strong style="color:var(--rd)">内部非成立の時</strong><br>
-      → 機械がダチョウを意図的に蹴飛ばす<br>
-      → 完璧なタイミングで押しても絶対に揃わない
-    </div>
-    <br>
-    <strong style="color:var(--ye)">「何度カットインが来ても揃わない」の真因：</strong><br>
-    カットイン = 内部成立の<strong>「濃厚」演出</strong>であり、100%確定ではない。<br>
-    カットインが来ても内部非成立の場合は<strong>何をしても揃わない</strong>。<br>
-    <br>
-    <div style="font-size:11px;color:var(--mu)">
-      ※ 逆押し（右→中→左）で打てていれば打ち方は正しい。<br>
-      ※ 下段を狙う意識は持っておいてよいが、引き込みがある以上1コマのズレは影響が少ない。<br>
-      ※ カットイン=チャンス演出（高確率だが外れあり）
-    </div>
+  <!-- 3: RB攻略 -->
+  <div class="acc-hd" onclick="toggleAcc(this)">
+    <span class="acc-arrow">▶</span>👑 RB中 — 10G継続・本機最強（超サバへの近道）
   </div>
-  <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.8;margin-bottom:8px">
-    <strong>ループストック抽選（160枚以上獲得で突入: 11.1%）</strong><br>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:6px;text-align:center">
-      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
-        <div style="font-size:10px;color:var(--mu)">1%</div>
-        <div style="font-size:13px;font-weight:700;color:var(--mu)">16.4%</div>
-      </div>
-      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
-        <div style="font-size:10px;color:var(--mu)">25%</div>
-        <div style="font-size:13px;font-weight:700;color:var(--bl)">16.4%</div>
-      </div>
-      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
-        <div style="font-size:10px;color:var(--mu)">50%</div>
-        <div style="font-size:13px;font-weight:700;color:var(--ye)">32.8%</div>
-      </div>
-      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
-        <div style="font-size:10px;color:var(--mu)">66%</div>
-        <div style="font-size:13px;font-weight:700;color:var(--or)">32.8%</div>
-      </div>
-      <div style="background:#1a1a1a;border-radius:4px;padding:4px">
-        <div style="font-size:10px;color:var(--mu)">80%</div>
-        <div style="font-size:13px;font-weight:700;color:var(--rd)">1.6%</div>
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--mu);margin-top:4px">約3回に2回は50%以上のループ率が選択される</div>
-  </div>
-
-  <!-- RB攻略 -->
-  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ RB(レギュラーボーナス)中 — 10G継続・本機最強</div>
-  <div style="background:rgba(63,185,80,.15);border:1px solid var(--gn);border-radius:10px;padding:12px;margin-bottom:8px">
-    <div style="font-size:14px;font-weight:800;color:var(--gn);margin-bottom:6px">👑 RBは超サバへの近道！</div>
-    <div style="font-size:13px;line-height:1.8">
-      押し順ベル成立で<strong style="color:var(--ye)">約66%</strong>の確率でSCストック獲得<br>
-      ※ほぼ毎回ストックが増える = 超サバに直結<br>
-      REGが来たら即ナビに従い、押し順は絶対に守ること
-    </div>
-  </div>
-
-  <!-- タマゴランプ -->
-  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">▼ タマゴランプ（ダチョウの卵） = SCストック数示唆</div>
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">
-    <div style="background:#222;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">🥚</div>
-      <div style="font-size:10px;color:#ccc;font-weight:700">白</div>
-      <div style="font-size:11px;color:var(--mu)">1個</div>
-    </div>
-    <div style="background:#0a1530;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">💙</div>
-      <div style="font-size:10px;color:var(--bl);font-weight:700">青</div>
-      <div style="font-size:11px;color:var(--mu)">2個</div>
-    </div>
-    <div style="background:#1a1500;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">💛</div>
-      <div style="font-size:10px;color:#fde68a;font-weight:700">黄</div>
-      <div style="font-size:11px;color:var(--mu)">3個</div>
-    </div>
-    <div style="background:#0d1a0d;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">💚</div>
-      <div style="font-size:10px;color:var(--gn);font-weight:700">緑</div>
-      <div style="font-size:11px;color:var(--mu)">4個</div>
-    </div>
-    <div style="background:#2d0f0f;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">❤️</div>
-      <div style="font-size:10px;color:var(--rd);font-weight:700">赤</div>
-      <div style="font-size:11px;color:var(--mu)">5個</div>
-    </div>
-    <div style="background:#1e0c38;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">💜</div>
-      <div style="font-size:10px;color:var(--pu);font-weight:700">紫</div>
-      <div style="font-size:11px;color:var(--mu)">6個</div>
-    </div>
-    <div style="background:#1a0e20;border-radius:6px;padding:6px 2px">
-      <div style="font-size:16px">🌈</div>
-      <div style="font-size:10px;color:#f0a8f0;font-weight:700">虹</div>
-      <div style="font-size:11px;color:var(--mu)">7個</div>
-    </div>
-  </div>
-
-  <!-- ダチョウ2種類の整理 -->
-  <div style="font-size:11px;color:var(--mu);margin-top:10px;margin-bottom:6px">▼ ダチョウ演出は2種類ある（重要）</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-    <div style="background:#1a1200;border:1px solid var(--ye);border-radius:8px;padding:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--ye);margin-bottom:4px">① BB中ダチョウ揃い<br>（リール上）</div>
-      <div style="font-size:11px;color:var(--mu);line-height:1.6">
-        カットイン時に逆押しで揃える<br>
-        = SCストック獲得示唆<br><br>
-        <strong style="color:var(--rd)">設定差：現時点で解析情報なし</strong><br>
-        （調査中・今後判明の可能性）
-      </div>
-    </div>
-    <div style="background:#0d1a0d;border:1px solid var(--gn);border-radius:8px;padding:10px">
-      <div style="font-size:12px;font-weight:700;color:var(--gn);margin-bottom:4px">② 通常時ダチョウ<br>（液晶通過演出）</div>
-      <div style="font-size:11px;color:var(--mu);line-height:1.6">
-        リール左の液晶をダチョウが走る<br>
-        = <strong style="color:var(--gn)">SC高確示唆！</strong><br>
-        青ドットで通過 = さらなる期待<br>
-        <strong style="color:var(--ye)">やめ時判断に重要</strong>
+  <div class="acc-body" style="display:none">
+    <div style="background:rgba(63,185,80,.15);border:1px solid var(--gn);border-radius:10px;padding:12px">
+      <div style="font-size:14px;font-weight:800;color:var(--gn);margin-bottom:6px">👑 RBは超サバへの近道！</div>
+      <div style="font-size:13px;line-height:1.8">
+        押し順ベル成立で<strong style="color:var(--ye)">約66%</strong>の確率でSCストック獲得<br>
+        ※ほぼ毎回ストックが増える = 超サバに直結<br>
+        REGが来たら即ナビに従い、押し順は絶対に守ること
       </div>
     </div>
   </div>
 
-  <!-- 通常時ダチョウ液晶のやめ時活用 -->
-  <div style="background:rgba(63,185,80,.1);border-left:3px solid var(--gn);border-radius:0 8px 8px 0;padding:10px;margin-bottom:10px;font-size:13px;line-height:1.8">
-    <strong style="color:var(--gn)">✅ 通常時ダチョウ液晶 = やめ時の重要サイン</strong><br>
-    <div style="font-size:12px;color:var(--mu);margin-top:4px">
-      ダチョウが液晶を通過 → SC高確に移行している → <strong style="color:var(--gn)">続行推奨</strong><br>
-      ダチョウが全く通過しない → 通常状態が続いている → <strong style="color:var(--rd)">やめ時を検討</strong><br>
-      青ドットで通過 → より期待度が高いSC高確 → <strong style="color:var(--ye)">強く続行</strong>
+  <!-- 4: タマゴランプ -->
+  <div class="acc-hd" onclick="toggleAcc(this)">
+    <span class="acc-arrow">▶</span>🥚 タマゴランプ — SCストック数示唆
+  </div>
+  <div class="acc-body" style="display:none">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">
+      <div style="background:#222;border-radius:6px;padding:6px 2px"><div style="font-size:16px">🥚</div><div style="font-size:10px;color:#ccc;font-weight:700">白</div><div style="font-size:11px;color:var(--mu)">1個</div></div>
+      <div style="background:#0a1530;border-radius:6px;padding:6px 2px"><div style="font-size:16px">💙</div><div style="font-size:10px;color:var(--bl);font-weight:700">青</div><div style="font-size:11px;color:var(--mu)">2個</div></div>
+      <div style="background:#1a1500;border-radius:6px;padding:6px 2px"><div style="font-size:16px">💛</div><div style="font-size:10px;color:#fde68a;font-weight:700">黄</div><div style="font-size:11px;color:var(--mu)">3個</div></div>
+      <div style="background:#0d1a0d;border-radius:6px;padding:6px 2px"><div style="font-size:16px">💚</div><div style="font-size:10px;color:var(--gn);font-weight:700">緑</div><div style="font-size:11px;color:var(--mu)">4個</div></div>
+      <div style="background:#2d0f0f;border-radius:6px;padding:6px 2px"><div style="font-size:16px">❤️</div><div style="font-size:10px;color:var(--rd);font-weight:700">赤</div><div style="font-size:11px;color:var(--mu)">5個</div></div>
+      <div style="background:#1e0c38;border-radius:6px;padding:6px 2px"><div style="font-size:16px">💜</div><div style="font-size:10px;color:var(--pu);font-weight:700">紫</div><div style="font-size:11px;color:var(--mu)">6個</div></div>
+      <div style="background:#1a0e20;border-radius:6px;padding:6px 2px"><div style="font-size:16px">🌈</div><div style="font-size:10px;color:#f0a8f0;font-weight:700">虹</div><div style="font-size:11px;color:var(--mu)">7個</div></div>
     </div>
   </div>
 
-  <!-- BB中ダチョウと設定の考察 -->
-  <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.7">
-    <strong style="color:var(--ye)">📊 BB中ダチョウ揃いと設定の関係（考察）</strong><br>
-    設定差の数値は現時点で非公開ですが：<br>
-    ・高設定 = SC初当たり優遇 = BBの機会が多い = ダチョウ揃いの機会も多い<br>
-    ・ダチョウ揃いが連続して成立しない = ストック獲得が少ない = 連チャンしにくい<br>
-    ・1度も揃わないBBが続く → 低設定 or 台が冷えている状態の可能性<br>
-    <span style="color:var(--mu)">※ 具体的な確率は解析情報公開次第更新します</span>
+  <!-- 5: ダチョウ演出2種類 -->
+  <div class="acc-hd" onclick="toggleAcc(this)">
+    <span class="acc-arrow">▶</span>🐦 ダチョウ演出は2種類ある（やめ時判断に重要）
+  </div>
+  <div class="acc-body" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="background:#1a1200;border:1px solid var(--ye);border-radius:8px;padding:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--ye);margin-bottom:4px">① BB中ダチョウ揃い<br>（リール上）</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">カットイン時に逆押しで揃える<br>= SCストック獲得示唆<br><br><strong style="color:var(--rd)">設定差：調査中</strong></div>
+      </div>
+      <div style="background:#0d1a0d;border:1px solid var(--gn);border-radius:8px;padding:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--gn);margin-bottom:4px">② 通常時ダチョウ<br>（液晶通過演出）</div>
+        <div style="font-size:11px;color:var(--mu);line-height:1.6">液晶をダチョウが走る<br>= <strong style="color:var(--gn)">SC高確示唆！</strong><br>青ドット通過 = さらに期待<br><strong style="color:var(--ye)">やめ時判断に重要</strong></div>
+      </div>
+    </div>
+    <div style="background:rgba(63,185,80,.1);border-left:3px solid var(--gn);border-radius:0 8px 8px 0;padding:10px;margin-bottom:8px;font-size:12px;line-height:1.8">
+      <strong style="color:var(--gn)">✅ ダチョウ液晶 = やめ時の重要サイン</strong><br>
+      通過あり → SC高確中 → <strong style="color:var(--gn)">続行推奨</strong><br>
+      通過なし → 通常状態継続 → <strong style="color:var(--rd)">やめ時を検討</strong><br>
+      青ドット通過 → より高いSC高確 → <strong style="color:var(--ye)">強く続行</strong>
+    </div>
+    <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:12px;line-height:1.7">
+      <strong style="color:var(--ye)">📊 BB中ダチョウ揃いと設定の関係（考察）</strong><br>
+      ・1度も揃わないBBが続く → 低設定 or 台が冷えている可能性<br>
+      <span style="color:var(--mu)">※ 具体的な確率は解析情報公開次第更新</span>
+    </div>
   </div>
 
-  <!-- 実戦経験則 -->
-  <div style="margin-top:10px;padding:10px;background:rgba(240,168,58,.08);border-left:3px solid var(--ye);border-radius:0 8px 8px 0;font-size:12px;line-height:1.7">
+  <!-- 実戦経験則: 常時表示 -->
+  <div style="margin-top:8px;padding:10px;background:rgba(240,168,58,.08);border-left:3px solid var(--ye);border-radius:0 8px 8px 0;font-size:12px;line-height:1.7">
     <strong style="color:var(--ye)">💡 実戦で確認された法則</strong><br>
-    ・昼グリーン画面 + ダチョウ液晶なし → ハマり継続の可能性 → やめ時<br>
-    ・夕方オレンジ or ダチョウ液晶通過 → SC高確中 → 続行推奨<br>
-    ・BB中ダチョウ揃いゼロ + 短い枚数が続く → 低設定の疑いあり<br>
-    ・低グラフ台拾い後に連チャン → 底で高確が重なっていた状態
+    ・昼グリーン + ダチョウ液晶なし → やめ時<br>
+    ・夕方オレンジ or ダチョウ液晶通過 → 続行推奨<br>
+    ・BB中ダチョウ揃いゼロ + 短い枚数 → 低設定の疑い<br>
+    ・低グラフ台拾い後に連チャン → 底で高確が重なっていた
   </div>
 </div>
 
@@ -879,6 +816,15 @@ function newSession() {
   S.startG = 0;
   S.medals = 0;
   STORE.saveCur(S);
+}
+
+/* ═══════════════════════════════════
+   ACCORDION
+═══════════════════════════════════ */
+function toggleAcc(hd) {
+  const body = hd.nextElementSibling;
+  const isOpen = hd.classList.toggle('open');
+  body.style.display = isOpen ? '' : 'none';
 }
 
 /* ═══════════════════════════════════
