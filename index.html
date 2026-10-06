@@ -105,7 +105,7 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 .lat-num:active{background:var(--c2)}
 
 /* SC MODE BUTTONS */
-.scm-btn{padding:12px 6px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .1s,box-shadow .2s;width:100%;border:2px solid transparent}
+.scm-btn{padding:10px 4px;border-radius:10px;cursor:pointer;-webkit-appearance:none;appearance:none;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .1s,box-shadow .2s;width:100%;border:2px solid transparent;text-align:center}
 .scm-btn:active{transform:scale(.93)}
 .scm-btn.flash{box-shadow:0 0 0 3px var(--bl)}
 
@@ -358,6 +358,31 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <button class="btn cyel btn-lg" onclick="endAT()">✅ AT終了→潜伏</button>
   </div>
 
+  <!-- SC色ボタン: AT開始のすぐ下に常時表示 -->
+  <div style="margin-top:8px;padding:10px;background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.3);border-radius:10px">
+    <div style="font-size:11px;color:var(--bl);font-weight:700;text-align:center;margin-bottom:8px">↑ AT開始後にSCの色をタップ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <button type="button" class="scm-btn" style="background:#2d0f0f" onclick="recordSCColor('chance')">
+        <span style="font-size:24px;line-height:1.2">🔴</span>
+        <span style="font-size:13px;font-weight:800;color:var(--rd);display:block">赤</span>
+        <span style="font-size:10px;color:var(--mu);display:block">チャンス</span>
+        <span style="font-size:20px;font-weight:900;color:var(--rd);display:block" id="scc-chance">0</span>
+      </button>
+      <button type="button" class="scm-btn" style="background:#0d1f40;border-color:var(--bl)" onclick="recordSCColor('heaven')">
+        <span style="font-size:24px;line-height:1.2">🔵</span>
+        <span style="font-size:13px;font-weight:800;color:var(--bl);display:block">青</span>
+        <span style="font-size:10px;color:var(--mu);display:block">天国濃厚!</span>
+        <span style="font-size:20px;font-weight:900;color:var(--bl);display:block" id="scc-heaven">0</span>
+      </button>
+      <button type="button" class="scm-btn" style="background:#271a00" onclick="recordSCColor('superHeaven')">
+        <span style="font-size:24px;line-height:1.2">🏅</span>
+        <span style="font-size:13px;font-weight:800;color:var(--ye);display:block">金</span>
+        <span style="font-size:10px;color:var(--mu);display:block">超天国確定</span>
+        <span style="font-size:20px;font-weight:900;color:var(--ye);display:block" id="scc-super">0</span>
+      </button>
+    </div>
+  </div>
+
   <div class="g3" style="margin-top:8px">
     <button class="btn cblue btn-sm" onclick="setMode('high')">SC高確</button>
     <button class="btn cred btn-sm" onclick="setMode('sp')">SP高確</button>
@@ -370,32 +395,9 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   </div>
 </div>
 
-<!-- ⑥-b SCモード色分布 -->
+<!-- ⑥-b SC分布グラフ -->
 <div class="card" id="scModeCard">
-  <div class="ch" style="margin-bottom:10px">SC突入色（タップで記録）＋ 本日の分布</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-    <button class="scm-btn" style="background:#2d0f0f" onclick="recordSCColor('chance')">
-      <span style="font-size:26px">🔴</span>
-      <span style="font-size:13px;font-weight:800;color:var(--rd)">赤</span>
-      <span style="font-size:10px;color:var(--mu)">チャンス</span>
-      <span style="font-size:22px;font-weight:900;color:var(--rd)" id="scc-chance">0</span>
-      <span style="font-size:9px;color:var(--mu)">回</span>
-    </button>
-    <button class="scm-btn" style="background:#0d1f40;border-color:var(--bl)" onclick="recordSCColor('heaven')">
-      <span style="font-size:26px">🔵</span>
-      <span style="font-size:13px;font-weight:800;color:var(--bl)">青</span>
-      <span style="font-size:10px;color:var(--mu)">天国濃厚!</span>
-      <span style="font-size:22px;font-weight:900;color:var(--bl)" id="scc-heaven">0</span>
-      <span style="font-size:9px;color:var(--mu)">回</span>
-    </button>
-    <button class="scm-btn" style="background:#271a00" onclick="recordSCColor('superHeaven')">
-      <span style="font-size:26px">🏅</span>
-      <span style="font-size:13px;font-weight:800;color:var(--ye)">金</span>
-      <span style="font-size:10px;color:var(--mu)">超天国確定</span>
-      <span style="font-size:22px;font-weight:900;color:var(--ye)" id="scc-super">0</span>
-      <span style="font-size:9px;color:var(--mu)">回</span>
-    </button>
-  </div>
+  <div class="ch" style="margin-bottom:8px">SC突入色 本日の分布</div>
   <div id="scModePie"></div>
 </div>
 
