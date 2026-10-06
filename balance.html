@@ -342,11 +342,10 @@ window.addEventListener('load', () => {
 });
 
 function initSeed() {
-  const all = STORE.all();
-  if (all.some(s => s.date === '2026-10-06')) return;
-  const invest = Math.round(6219 * (1000 / G50));
-  const recover = 1300 * 20;
-  all.push({
+  let all = STORE.all();
+  // 誤投資額（G数ベース計算）で登録済みの場合も上書き修正する
+  const idx = all.findIndex(s => s.id === '20261006_625');
+  const seed = {
     id: '20261006_625',
     date: '2026-10-06',
     machineNum: 1,
@@ -354,18 +353,23 @@ function initSeed() {
     rate: 20,
     startTime: '',
     endTime: '',
-    totalG: 6219,
+    totalG: 6219,          // 台の累計G（途中着席のため自分のG数ではない）
     scCount: 45,
     avgHit: Math.round(6219 / 45),
     sabaRen: 4,
     superSaba: 0,
     rbCount: 7,
-    memo: 'ART45回/RB7回 ※台#625途中着席',
+    memo: 'ART45回/RB7回 ※台#625途中着席・実投資26,000円',
     finalMedals: 1300,
-    investYen: invest,
-    balanceYen: recover - invest,
+    investYen: 26000,      // 実際の投資額（途中着席のためG数計算と乖離）
+    balanceYen: 1300 * 20 - 26000,   // 26,000円回収 - 26,000円投資 = 0円
     manual: true,
-  });
+  };
+  if (idx >= 0) {
+    all[idx] = seed;       // 既存レコードを正しい値で上書き
+  } else {
+    all.push(seed);
+  }
   localStorage.setItem('juuou_sess_v3', JSON.stringify(all));
 }
 
