@@ -104,6 +104,14 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 .lat-num{font-size:46px;font-weight:900;color:#a78bfa;line-height:1;cursor:pointer;background:var(--bg);border:2px solid var(--bd);border-radius:8px;padding:8px 14px;text-align:center;min-width:90px}
 .lat-num:active{background:var(--c2)}
 
+/* TOGGLE SWITCH */
+.tog{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tog-sl{position:absolute;inset:0;background:var(--bd);border-radius:13px;cursor:pointer;transition:.25s}
+.tog-sl:before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s}
+.tog input:checked+.tog-sl{background:var(--or)}
+.tog input:checked+.tog-sl:before{transform:translateX(20px)}
+
 /* ACCORDION */
 .acc-hd{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--c2);border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;color:var(--tx);margin-bottom:4px;-webkit-tap-highlight-color:transparent;user-select:none;border:1px solid var(--bd)}
 .acc-hd:active{opacity:.7}
@@ -269,6 +277,18 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     </div>
     <input type="number" inputmode="numeric" class="big-inp" id="inputStartG" placeholder="0（オープン）" min="0" max="998" onchange="setStartG(this.value)" onfocus="this.select()">
     <div style="font-size:10px;color:var(--mu);margin-top:4px;text-align:center" id="startGNote">0 = オープン着席（最初から打つ）</div>
+  </div>
+
+  <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,166,87,.08);border:1px solid var(--or);border-radius:10px">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--or)">🌅 朝イチ・開店から打つ</div>
+      <div style="font-size:10px;color:var(--mu);margin-top:2px" id="openingNote">天井は<strong style="color:var(--or)">999G</strong>（通常）</div>
+    </div>
+    <label class="tog">
+      <input type="checkbox" id="openingToggle" onchange="setOpeningMode(this.checked)">
+      <span class="tog-sl"></span>
+    </label>
   </div>
 </div>
 
@@ -908,6 +928,12 @@ window.addEventListener('load', () => {
     if (S.scCount)  document.getElementById('inputSCCount').value  = S.scCount;
     if (S.startG)   { document.getElementById('inputStartG').value = S.startG; setStartG(S.startG); }
     if (S.medals)   document.getElementById('livemedals').value = S.medals;
+    const tog = document.getElementById('openingToggle');
+    if (tog) {
+      tog.checked = !!S.isReset;
+      const note = document.getElementById('openingNote');
+      if (note && S.isReset) note.innerHTML = '天井は<strong style="color:var(--or)">599G</strong>に短縮中（サバ連後に自動で999Gに戻る）';
+    }
   } else {
     newSession();
   }
@@ -1170,6 +1196,18 @@ function startAT() {
   const seatNote = S.startG > 0 ? `（着席${S.startG}G〜${S.g}G / 自分${myG}G）` : '';
   addLog(`AT開始(${S.g}G)${seatNote} — ${S.scCount}連目 | 自分の総G:${S.sessionG}`);
   S.g = 0; S.startG = 0; S.mode = 'at';
+
+  // 設定変更後（天井599G）はサバ連2連目以降で自動解除 → 999Gに戻る
+  if (S.isReset && S.scCount >= 2) {
+    S.isReset = false;
+    const tog = document.getElementById('openingToggle');
+    if (tog) tog.checked = false;
+    const note = document.getElementById('openingNote');
+    if (note) note.innerHTML = '天井は<strong style="color:var(--or)">999G</strong>（通常）';
+    addLog('サバ連突入 → 天井が999Gに戻りました');
+    showToast('🔄 サバ連突入！天井が999Gに戻りました');
+  }
+
   STORE.saveCur(S);
   renderAll();
   showSCColorPicker();
@@ -1195,8 +1233,27 @@ function setMode(m) {
   S.mode = m; renderAll();
 }
 
+function setOpeningMode(on) {
+  S.isReset = on;
+  const note = document.getElementById('openingNote');
+  if (on) {
+    if (note) note.innerHTML = '天井は<strong style="color:var(--or)">599G</strong>に短縮中（サバ連後に自動で999Gに戻る）';
+    addLog('🌅 朝イチ/設定変更後モード ON → 天井599G');
+    showToast('🌅 天井599Gモード ON（サバ連後に自動解除）');
+  } else {
+    if (note) note.innerHTML = '天井は<strong style="color:var(--or)">999G</strong>（通常）';
+    addLog('天井999Gに戻しました');
+  }
+  STORE.saveCur(S);
+  renderAll();
+}
+
 function doReset() {
   S.g = 0; S.isReset = true; S.mode = 'normal';
+  const tog = document.getElementById('openingToggle');
+  if (tog) tog.checked = true;
+  const note = document.getElementById('openingNote');
+  if (note) note.innerHTML = '天井は<strong style="color:var(--or)">599G</strong>に短縮中（サバ連後に自動で999Gに戻る）';
   addLog('設定変更後: 天井599Gに短縮'); renderAll();
 }
 
