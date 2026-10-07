@@ -227,6 +227,20 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
     <span class="est-note" id="topEstNote">データ不足</span>
   </div>
   <div class="quit-row" id="topQuit">—</div>
+
+  <hr class="div-line">
+
+  <!-- リアルタイム損益 -->
+  <div style="font-size:11px;color:var(--mu);margin-bottom:6px">💰 現在の持ちメダル（AT後に更新）</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center">
+    <input type="number" inputmode="numeric" class="big-inp" id="livemedals" placeholder="0枚" min="0"
+           oninput="setMedals(this.value)" onfocus="this.select()" style="font-size:24px;padding:8px">
+    <div style="border-radius:10px;border:2px solid var(--bd);padding:10px;text-align:center" id="livePLBox">
+      <div style="font-size:10px;color:var(--mu)">現在の損益</div>
+      <div style="font-size:26px;font-weight:900;line-height:1.1;color:var(--mu)" id="livePL">—</div>
+      <div style="font-size:10px;color:var(--mu);margin-top:2px" id="livePLSub">枚数を入力</div>
+    </div>
+  </div>
 </div>
 
 <!-- ① 手動入力 -->
@@ -359,6 +373,12 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
 
 <!-- ⑤ アドバイス -->
 <div id="advBox"></div>
+
+<!-- ⑤-b 設定予測・展開シミュレーション -->
+<div class="card" id="predCard">
+  <div class="ch" style="margin-bottom:8px">📊 設定予測 ＆ 展開シミュレーション</div>
+  <div id="predBox"><div style="color:var(--mu);font-size:12px;text-align:center;padding:10px">AT開始を記録すると予測が表示されます</div></div>
+</div>
 
 <!-- ⑥ 状態変更 -->
 <div class="card">
@@ -887,6 +907,7 @@ window.addEventListener('load', () => {
     if (S.sessionG) document.getElementById('inputSessionG').value = S.sessionG;
     if (S.scCount)  document.getElementById('inputSCCount').value  = S.scCount;
     if (S.startG)   { document.getElementById('inputStartG').value = S.startG; setStartG(S.startG); }
+    if (S.medals)   document.getElementById('livemedals').value = S.medals;
   } else {
     newSession();
   }
@@ -908,6 +929,146 @@ function newSession() {
   S.startG = 0;
   S.medals = 0;
   STORE.saveCur(S);
+}
+
+/* ═══════════════════════════════════
+   LIVE P&L
+═══════════════════════════════════ */
+function setMedals(v) {
+  S.medals = Math.max(0, parseInt(v) || 0);
+  renderLivePL();
+  renderPrediction();
+  STORE.saveCur(S);
+}
+
+function renderLivePL() {
+  const medals = S.medals || 0;
+  const totalG = (S.sessionG || 0) + (S.g || 0);
+  const box = document.getElementById('livePLBox');
+  const plEl = document.getElementById('livePL');
+  const sub = document.getElementById('livePLSub');
+  if (!box || !plEl) return;
+
+  if (medals === 0) {
+    box.style.borderColor = 'var(--bd)';
+    plEl.textContent = '—'; plEl.style.color = 'var(--mu)';
+    if (sub) sub.textContent = '枚数を入力';
+    return;
+  }
+  const invest  = Math.round(totalG * cpg(S.rate));
+  const recover = medals * S.rate;
+  const pl = recover - invest;
+  box.style.borderColor = pl >= 0 ? 'var(--gn)' : 'var(--rd)';
+  plEl.textContent = (pl >= 0 ? '+' : '') + pl.toLocaleString() + '円';
+  plEl.style.color  = pl >= 0 ? 'var(--gn)' : 'var(--rd)';
+  if (sub) sub.textContent = `投資${invest.toLocaleString()}円 / 価値${recover.toLocaleString()}円`;
+}
+
+/* ═══════════════════════════════════
+   SETTING PREDICTION & SIMULATION
+═══════════════════════════════════ */
+function renderPrediction() {
+  const el = document.getElementById('predBox');
+  if (!el) return;
+  const sc = S.scCount, sg = S.sessionG || 0, g = S.g;
+  const ceil = S.isReset ? CEIL_R : CEIL_N;
+  const rem = ceil - g;
+  const medals = S.medals || 0;
+
+  if (sc === 0 && sg === 0) {
+    el.innerHTML = '<div style="color:var(--mu);font-size:12px;text-align:center;padding:10px">AT開始を記録すると予測が表示されます</div>';
+    return;
+  }
+
+  const totalG = sg + g;
+  const artRate = sc > 0 ? Math.round(totalG / sc) : null;
+
+  // 設定推定
+  let sLbl, sColor, sNote, sScore = 0;
+  if (!artRate || sc < 3) {
+    sLbl = '判定中'; sColor = 'var(--mu)'; sNote = 'サンプル不足（AT3回以上で精度向上）'; sScore = 0;
+  } else if (artRate <= 80)  { sLbl = '超高設定級'; sColor = '#ffd700'; sNote = '設定6(1/279)を大幅超過！今すぐ続行'; sScore = 100; }
+  else if (artRate <= 100) { sLbl = '高設定(設定6相当)'; sColor = 'var(--rd)'; sNote = '設定6: 1/279G相当の当選率'; sScore = 90; }
+  else if (artRate <= 130) { sLbl = '高設定(設定5相当)'; sColor = 'var(--or)'; sNote = '設定5: 1/287G相当'; sScore = 75; }
+  else if (artRate <= 180) { sLbl = '中設定(設定4相当)'; sColor = 'var(--ye)'; sNote = '設定4: 1/295G相当'; sScore = 55; }
+  else if (artRate <= 280) { sLbl = '低〜中設定(設定1〜2)'; sColor = 'var(--mu)'; sNote = '設定1〜2: 1/321〜326G相当'; sScore = 30; }
+  else { sLbl = '低設定(ハマり)'; sColor = '#484f58'; sNote = '設定1(1/326)以下。天井の権利を使い切ること'; sScore = 10; }
+
+  // 追加指標（謎高確・青ランプ）
+  const mysteryBoost = (S.highStats?.mystery?.entered || 0) >= 3;
+  const blueLampBoost = (S.scLamp?.blue || 0) >= 2;
+  const bonusTips = [];
+  if (mysteryBoost) bonusTips.push({ t:'✅ 謎高確多発', c:'var(--pu)', n:'設定差最大指標。高設定の強い示唆' });
+  if (blueLampBoost) bonusTips.push({ t:'🔵 青ランプ複数回', c:'var(--bl)', n:'ストック2個以上を複数回確認' });
+
+  // 展開シミュレーション
+  const remCost = Math.round(rem * cpg(S.rate));
+  const expectedATs = artRate ? Math.round(rem / artRate) : 0;
+
+  // 今やめた場合の損益
+  const curPL = medals > 0
+    ? medals * S.rate - Math.round(totalG * cpg(S.rate))
+    : null;
+
+  // 天井まで続けた場合の期待値（簡易: AT1回あたり平均200枚と仮定）
+  const avgATmedals = artRate && artRate <= 150 ? 350 : 200;
+  const expAdd = expectedATs * avgATmedals * S.rate - remCost;
+
+  // 続行推奨スコア → アドバイス
+  let recLbl, recColor, recBg;
+  const totalScore = sScore + (rem <= 200 ? 30 : rem <= 500 ? 15 : 0) + (mysteryBoost ? 15 : 0) + (blueLampBoost ? 10 : 0);
+  if (totalScore >= 70 || rem <= 80)  { recLbl = '🔥 強く続行推奨'; recColor = 'var(--rd)'; recBg = 'rgba(248,81,73,.15)'; }
+  else if (totalScore >= 45 || rem <= 200) { recLbl = '✅ 続行推奨'; recColor = 'var(--gn)'; recBg = 'rgba(63,185,80,.1)'; }
+  else if (totalScore >= 25) { recLbl = '👀 様子見'; recColor = 'var(--ye)'; recBg = 'rgba(240,168,58,.1)'; }
+  else { recLbl = '⛔ やめ時候補'; recColor = 'var(--mu)'; recBg = 'rgba(125,133,144,.1)'; }
+
+  el.innerHTML = `
+    <!-- 設定予測 -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--mu);margin-bottom:2px">本セッション ART当選率</div>
+        <div style="font-size:28px;font-weight:900;color:${sColor};line-height:1">1/${artRate||'—'}G</div>
+        <div style="font-size:13px;font-weight:700;color:${sColor}">${sLbl}</div>
+        <div style="font-size:10px;color:var(--mu);margin-top:2px">${sNote}</div>
+      </div>
+      <div style="text-align:center;min-width:54px">
+        <div style="font-size:36px;font-weight:900;color:${sColor};line-height:1">${sScore}</div>
+        <div style="font-size:10px;color:var(--mu)">/ 100</div>
+      </div>
+    </div>
+
+    ${bonusTips.map(t=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(255,255,255,.04);border-radius:6px;margin-bottom:4px">
+      <span style="color:${t.c};font-weight:700;font-size:12px">${t.t}</span>
+      <span style="font-size:10px;color:var(--mu)">${t.n}</span>
+    </div>`).join('')}
+
+    <hr style="border:none;border-top:1px solid var(--bd);margin:10px 0">
+
+    <!-- 展開シミュレーション -->
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px">天井まで残り${rem}G のシミュレーション</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr ${curPL!==null?'1fr':''};gap:6px;margin-bottom:10px">
+      <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:10px;color:var(--mu)">追加投資見込み</div>
+        <div style="font-size:18px;font-weight:800;color:var(--rd)">-${remCost.toLocaleString()}</div>
+        <div style="font-size:9px;color:var(--mu)">円</div>
+      </div>
+      <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:10px;color:var(--mu)">期待AT回数</div>
+        <div style="font-size:18px;font-weight:800;color:var(--bl)">${expectedATs}回</div>
+        <div style="font-size:9px;color:var(--mu)">現在の当選率ベース</div>
+      </div>
+      ${curPL !== null ? `<div style="background:${curPL>=0?'rgba(63,185,80,.15)':'rgba(248,81,73,.15)'};border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:10px;color:var(--mu)">今やめると</div>
+        <div style="font-size:18px;font-weight:800;color:${curPL>=0?'var(--gn)':'var(--rd)'}">${curPL>=0?'+':''}${curPL.toLocaleString()}</div>
+        <div style="font-size:9px;color:var(--mu)">円</div>
+      </div>` : ''}
+    </div>
+
+    <!-- 総合判断 -->
+    <div style="padding:12px;border-radius:10px;background:${recBg};border:1px solid ${recColor};text-align:center">
+      <div style="font-size:17px;font-weight:900;color:${recColor}">${recLbl}</div>
+      ${expAdd !== 0 ? `<div style="font-size:11px;color:var(--mu);margin-top:4px">天井まで続けた場合の期待追加収支: <strong style="color:${expAdd>=0?'var(--gn)':'var(--rd)'}">${expAdd>=0?'+':''}${Math.round(expAdd/100)*100}円</strong>（概算）</div>` : ''}
+    </div>`;
 }
 
 /* ═══════════════════════════════════
@@ -1399,6 +1560,8 @@ function renderAll() {
   renderTopStatus();
   renderHighStats();
   renderSCModePie();
+  renderLivePL();
+  renderPrediction();
   syncInputs();
   renderTrigLog();
 }
