@@ -155,6 +155,11 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
     <div class="sbox"><div class="lbl">総投資</div><div class="val trd" id="aInvest">0</div><div class="sub">円</div></div>
     <div class="sbox"><div class="lbl">通算収支</div><div class="val zero" id="aBal">±0</div><div class="sub">円</div></div>
   </div>
+  <div class="sg3" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
+    <div class="sbox"><div class="lbl">累計ART回数</div><div class="val tye" id="aArtTotal">0</div><div class="sub">回</div></div>
+    <div class="sbox"><div class="lbl">累計ATゲーム</div><div class="val tpu" id="aAtgTotal">0</div><div class="sub">回</div></div>
+    <div class="sbox"><div class="lbl">累計RB回数</div><div class="val tbl" id="aRbTotal">0</div><div class="sub">回</div></div>
+  </div>
 </div>
 
 <!-- ④ 台変更ごとの収支グラフ -->
@@ -190,7 +195,7 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
   <div style="overflow-x:auto">
     <table class="dtable" id="sessTable">
       <thead>
-        <tr><th>日付・台</th><th>総G</th><th>SC</th><th>初当</th><th>収支</th><th></th></tr>
+        <tr><th>日付・台</th><th>総G</th><th>SC/RB</th><th>ATG</th><th>収支</th><th></th></tr>
       </thead>
       <tbody id="sessBody">
         <tr><td colspan="6" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>
@@ -259,6 +264,10 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
       <label class="mlbl">最高連続</label>
       <input type="number" inputmode="numeric" class="mfield" id="mMaxRen" placeholder="例: 5">
     </div>
+  </div>
+  <div class="mrow">
+    <label class="mlbl">総ARTゲーム数（データ画面の「総ARTゲーム」）</label>
+    <input type="number" inputmode="numeric" class="mfield" id="mAtg" placeholder="例: 1710" style="width:100%">
   </div>
 
   <!-- 収支 -->
@@ -343,33 +352,36 @@ window.addEventListener('load', () => {
 
 function initSeed() {
   let all = STORE.all();
-  // 誤投資額（G数ベース計算）で登録済みの場合も上書き修正する
-  const idx = all.findIndex(s => s.id === '20261006_625');
-  const seed = {
-    id: '20261006_625',
-    date: '2026-10-06',
-    machineNum: 1,
-    machineName: '#625',
-    rate: 20,
-    startTime: '',
-    endTime: '',
-    totalG: 6219,          // 台の累計G（途中着席のため自分のG数ではない）
-    scCount: 45,
-    avgHit: Math.round(6219 / 45),
-    sabaRen: 4,
-    superSaba: 0,
-    rbCount: 7,
-    memo: 'ART45回/RB7回 ※台#625途中着席・実投資26,000円',
-    finalMedals: 1300,
-    investYen: 26000,      // 実際の投資額（途中着席のためG数計算と乖離）
-    balanceYen: 1300 * 20 - 26000,   // 26,000円回収 - 26,000円投資 = 0円
-    manual: true,
-  };
-  if (idx >= 0) {
-    all[idx] = seed;       // 既存レコードを正しい値で上書き
-  } else {
-    all.push(seed);
-  }
+
+  // ── 2026-10-06 #625 ──
+  const seeds = [
+    {
+      id: '20261006_625',
+      date: '2026-10-06', machineNum: 1, machineName: '#625', rate: 20,
+      startTime: '', endTime: '',
+      totalG: 6219, scCount: 45, avgHit: Math.round(6219/45),
+      sabaRen: 4, superSaba: 0, rbCount: 7, totalAtG: 0,
+      memo: 'ART45回/RB7回 ※台#625途中着席・投資26,000円',
+      finalMedals: 1300, investYen: 26000, balanceYen: 1300*20-26000, manual: true,
+    },
+    // ── 2026-10-07 #624 ──
+    {
+      id: '20261007_624',
+      date: '2026-10-07', machineNum: 1, machineName: '#624', rate: 20,
+      startTime: '', endTime: '',
+      totalG: 8442,        // 推定: ART102×66 + AT1710G
+      scCount: 102, avgHit: 83,
+      sabaRen: 48, superSaba: 1, rbCount: 13, totalAtG: 1710,
+      memo: 'ART102回/RB13/48連(超サバ到達) #624 最高7824枚 投資45,000円',
+      finalMedals: 7619, investYen: 45000, balanceYen: 7619*20-45000, manual: true,
+    },
+  ];
+
+  seeds.forEach(seed => {
+    const idx = all.findIndex(s => s.id === seed.id);
+    if (idx >= 0) all[idx] = seed;
+    else all.push(seed);
+  });
   localStorage.setItem('juuou_sess_v3', JSON.stringify(all));
 }
 
@@ -440,13 +452,23 @@ function renderSummary() {
   tBalEl.className   = 'val ' + (tBalAll>0?'tgn':tBalAll<0?'trd':'zero');
 
   // 通算（保存済みのみ）
-  const aInvest = sessions.reduce((a,s) => a+(s.investYen||0), 0);
-  const aBal    = sessions.reduce((a,s) => a+(s.balanceYen||0), 0);
+  const aInvest  = sessions.reduce((a,s) => a+(s.investYen||0), 0);
+  const aBal     = sessions.reduce((a,s) => a+(s.balanceYen||0), 0);
+  const aArt     = sessions.reduce((a,s) => a+(s.scCount||0), 0);
+  const aAtg     = sessions.reduce((a,s) => a+(s.totalAtG||0), 0);
+  const aRb      = sessions.reduce((a,s) => a+(s.rbCount||0), 0);
   document.getElementById('aSessions').textContent = sessions.length + '回';
   document.getElementById('aInvest').textContent   = aInvest.toLocaleString();
   const aBalEl = document.getElementById('aBal');
   aBalEl.textContent = (aBal>=0?'+':'') + aBal.toLocaleString();
   aBalEl.className   = 'val ' + (aBal>0?'tgn':aBal<0?'trd':'zero');
+
+  const artEl = document.getElementById('aArtTotal');
+  const atgEl = document.getElementById('aAtgTotal');
+  const rbEl  = document.getElementById('aRbTotal');
+  if (artEl) artEl.textContent = aArt.toLocaleString();
+  if (atgEl) atgEl.textContent = aAtg.toLocaleString();
+  if (rbEl)  rbEl.textContent  = aRb.toLocaleString();
 }
 
 /* ─────────────────────────
@@ -583,14 +605,16 @@ function buildSessionTable() {
     const machineName = s.machineName ? ` (${s.machineName})` : '';
     const memo = s.memo ? `<div style="font-size:10px;color:var(--pu)">${s.memo}</div>` : '';
     const manual = s.manual ? '<span style="font-size:9px;background:#1e3a8a;color:var(--bl);padding:1px 5px;border-radius:4px;margin-left:4px">手動</span>' : '';
+    const atgStr = s.totalAtG ? `<span style="color:var(--pu);font-weight:700">${s.totalAtG.toLocaleString()}</span>` : '—';
+    const sabaStr = s.sabaRen ? `<div style="font-size:9px;color:var(--ye)">${s.sabaRen}連</div>` : '';
     return `<tr>
       <td>${d} 第${s.machineNum||'?'}台${machineName}${manual}<br>
         <span style="font-size:10px;color:var(--mu)">${s.startTime||''}${s.endTime?'〜'+s.endTime:''}</span>
         ${memo}
       </td>
-      <td>${(s.totalG||0).toLocaleString()}G</td>
-      <td>${s.scCount||0}回</td>
-      <td>${avg}</td>
+      <td style="font-size:12px">${(s.totalG||0).toLocaleString()}G</td>
+      <td style="font-size:12px">${s.scCount||0}<span style="color:var(--mu)">回</span><br><span style="font-size:10px;color:var(--bl)">RB${s.rbCount||0}</span>${sabaStr}</td>
+      <td style="font-size:12px">${atgStr}</td>
       <td class="${cls} bold">${(bal>=0?'+':'')+bal.toLocaleString()}円</td>
       <td><button onclick="deleteSession(${i})" style="background:#2d0f0f;border:none;color:var(--rd);border-radius:4px;padding:3px 6px;font-size:11px;cursor:pointer">削除</button></td>
     </tr>`;
@@ -688,6 +712,7 @@ function saveManualSession() {
   const sc      = parseInt(document.getElementById('mSC').value)      || 0;
   const rb      = parseInt(document.getElementById('mRB').value)      || 0;
   const maxRen  = parseInt(document.getElementById('mMaxRen').value)  || 0;
+  const atg     = parseInt(document.getElementById('mAtg').value)     || 0;
   const memo    = document.getElementById('mMemo').value.trim();
   const medals  = parseInt(document.getElementById('mMedals').value)  || 0;
   const mInv    = parseInt(document.getElementById('mInvest').value)  || 0;
@@ -721,6 +746,7 @@ function saveManualSession() {
     scCount: sc,
     avgHit: (sc > 0 && totalG > 0) ? Math.round(totalG / sc) : null,
     sabaRen: maxRen,
+    totalAtG: atg || null,
     superSaba: 0,
     rbCount: rb,
     memo: memo || null,
