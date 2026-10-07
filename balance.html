@@ -162,7 +162,13 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
   </div>
 </div>
 
-<!-- ④ 台変更ごとの収支グラフ -->
+<!-- ④ 資金管理・軍資金分析 -->
+<div class="card">
+  <div class="ch" style="margin-bottom:8px">💰 資金管理・軍資金分析</div>
+  <div id="budgetBox"><div style="color:var(--mu);text-align:center;font-size:12px;padding:10px">2セッション以上蓄積すると分析が表示されます</div></div>
+</div>
+
+<!-- ⑤ 台変更ごとの収支グラフ -->
 <div class="card">
   <div class="ch">台変更ごとの収支</div>
   <div class="chart-wrap">
@@ -345,6 +351,7 @@ window.addEventListener('load', () => {
   setRateUI(currentRate);
   calcCur();
   renderSummary();
+  renderBudgetAnalysis();
   buildSessionChart();
   buildDailyChart();
   buildSessionTable();
@@ -360,8 +367,8 @@ function initSeed() {
       date: '2026-10-06', machineNum: 1, machineName: '#625', rate: 20,
       startTime: '', endTime: '',
       totalG: 6219, scCount: 45, avgHit: Math.round(6219/45),
-      sabaRen: 4, superSaba: 0, rbCount: 7, totalAtG: 0,
-      memo: 'ART45回/RB7回 ※台#625途中着席・投資26,000円',
+      sabaRen: 4, superSaba: 0, rbCount: 7, totalAtG: 784,
+      memo: 'ART45回/RB7/ATG784回 ※台#625途中着席・投資26,000円',
       finalMedals: 1300, investYen: 26000, balanceYen: 1300*20-26000, manual: true,
     },
     // ── 2026-10-07 #624 ──
@@ -469,6 +476,132 @@ function renderSummary() {
   if (artEl) artEl.textContent = aArt.toLocaleString();
   if (atgEl) atgEl.textContent = aAtg.toLocaleString();
   if (rbEl)  rbEl.textContent  = aRb.toLocaleString();
+}
+
+/* ─────────────────────────
+   BUDGET ANALYSIS
+───────────────────────── */
+function renderBudgetAnalysis() {
+  const el = document.getElementById('budgetBox');
+  if (!el) return;
+  const sessions = STORE.all();
+  if (sessions.length < 2) {
+    el.innerHTML = '<div style="color:var(--mu);text-align:center;font-size:12px;padding:10px">2セッション以上蓄積すると分析が表示されます（現在'+sessions.length+'件）</div>';
+    return;
+  }
+
+  const invests  = sessions.map(s=>s.investYen||0).filter(v=>v>0);
+  const balances = sessions.map(s=>s.balanceYen||0);
+  const n = sessions.length;
+
+  const totalInvest = invests.reduce((a,b)=>a+b,0);
+  const avgInvest   = Math.round(totalInvest / invests.length);
+  const maxInvest   = Math.max(...invests);
+  const minInvest   = Math.min(...invests);
+  const totalBal    = balances.reduce((a,b)=>a+b,0);
+  const avgBal      = Math.round(totalBal / n);
+  const maxLoss     = Math.abs(Math.min(...balances.filter(b=>b<0), 0));
+  const wins        = balances.filter(b=>b>0).length;
+  const winRate     = Math.round(wins/n*100);
+
+  // ATG効率
+  const atgSess   = sessions.filter(s=>s.totalAtG>0);
+  const avgAtg    = atgSess.length ? Math.round(atgSess.reduce((a,s)=>a+(s.totalAtG||0),0)/atgSess.length) : 0;
+  const avgSc     = Math.round(sessions.reduce((a,s)=>a+(s.scCount||0),0)/n);
+  const atgPerSc  = (avgAtg>0&&avgSc>0) ? Math.round(avgAtg/avgSc) : 0;
+
+  // 軍資金計算
+  const minBudget  = Math.round(maxInvest/1000)*1000;
+  const recBudget  = Math.round(maxInvest*1.5/1000)*1000;
+  const safeBudget = Math.round(maxInvest*2/1000)*1000;
+
+  // 1セッション当たりの推奨初期投資
+  const initRec = Math.round(avgInvest*1.2/1000)*1000;
+
+  const fmt = v => v.toLocaleString()+'円';
+  const clr = v => v>0?'var(--gn)':v<0?'var(--rd)':'var(--mu)';
+  const sign = v => (v>=0?'+':'')+v.toLocaleString();
+
+  el.innerHTML = `
+    <!-- 基本統計 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:var(--mu)">平均投資額/回</div>
+        <div style="font-size:17px;font-weight:800;color:var(--rd)">${(avgInvest/1000).toFixed(0)}k</div>
+        <div style="font-size:9px;color:var(--mu)">円</div>
+      </div>
+      <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:var(--mu)">平均収支/回</div>
+        <div style="font-size:17px;font-weight:800;color:${clr(avgBal)}">${sign(Math.round(avgBal/1000))}k</div>
+        <div style="font-size:9px;color:var(--mu)">円</div>
+      </div>
+      <div style="background:var(--c2);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:9px;color:var(--mu)">勝率</div>
+        <div style="font-size:17px;font-weight:800;color:${winRate>=50?'var(--gn)':'var(--rd)'}">${winRate}%</div>
+        <div style="font-size:9px;color:var(--mu)">${wins}勝${n-wins}敗</div>
+      </div>
+    </div>
+
+    <!-- ATG効率 -->
+    ${avgAtg>0?`
+    <div style="background:rgba(188,140,255,.1);border-left:3px solid var(--pu);border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:10px;font-size:12px">
+      <strong style="color:var(--pu)">ATゲーム効率</strong><br>
+      <span style="color:var(--mu)">平均ATG/セッション: <strong>${avgAtg.toLocaleString()}回</strong>
+      ${atgPerSc>0?' ／ AT1回あたり平均: <strong>'+atgPerSc+'G</strong>':''}
+      <br>ATGが多い = ストックが積み重なっている = 連チャン回数が多い台</span>
+    </div>`:''}
+
+    <!-- 投資レンジ -->
+    <div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:6px">📊 過去の投資レンジ（${n}セッション）</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      <div style="background:var(--c2);border-radius:8px;padding:8px">
+        <div style="font-size:10px;color:var(--mu)">最大投資額</div>
+        <div style="font-size:18px;font-weight:800;color:var(--rd)">${fmt(maxInvest)}</div>
+      </div>
+      <div style="background:var(--c2);border-radius:8px;padding:8px">
+        <div style="font-size:10px;color:var(--mu)">最小投資額</div>
+        <div style="font-size:18px;font-weight:800;color:var(--ye)">${fmt(minInvest)}</div>
+      </div>
+    </div>
+
+    <!-- 軍資金推奨 -->
+    <div style="font-size:11px;color:var(--mu);font-weight:700;margin-bottom:6px">💰 推奨 初期投資・軍資金</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(88,166,255,.1);border-left:4px solid var(--bl);border-radius:0 8px 8px 0">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--bl)">1回あたりの目安投資額</div>
+          <div style="font-size:10px;color:var(--mu)">過去平均の1.2倍。余裕を持った1セッション予算</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--bl)">${fmt(initRec)}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(240,168,58,.1);border-left:4px solid var(--ye);border-radius:0 8px 8px 0">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--ye)">最低軍資金（1日）</div>
+          <div style="font-size:10px;color:var(--mu)">過去最大投資額をカバー</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--ye)">${fmt(minBudget)}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(63,185,80,.1);border-left:4px solid var(--gn);border-radius:0 8px 8px 0">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--gn)">推奨軍資金（1日）</div>
+          <div style="font-size:10px;color:var(--mu)">最大投資の1.5倍。悪い日でも追加できる余裕</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--gn)">${fmt(recBudget)}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(188,140,255,.1);border-left:4px solid var(--pu);border-radius:0 8px 8px 0">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--pu)">安心軍資金（1日）</div>
+          <div style="font-size:10px;color:var(--mu)">最大投資の2倍。天井まで確実に打ち切れる</div>
+        </div>
+        <div style="font-size:20px;font-weight:900;color:var(--pu)">${fmt(safeBudget)}</div>
+      </div>
+    </div>
+
+    <div style="background:var(--c2);border-radius:8px;padding:10px;font-size:10px;line-height:1.8;color:var(--mu)">
+      ※ セッションが増えるほど精度が上がります（現在${n}件）<br>
+      ※ 軍資金 = その日の上限。負けても補充しない金額で管理推奨<br>
+      ※ 途中着席・朝イチ等で投資額が変わるため実態に合わせて調整
+    </div>`;
 }
 
 /* ─────────────────────────
@@ -765,6 +898,7 @@ function saveManualSession() {
 
 function rebuildAll() {
   renderSummary();
+  renderBudgetAnalysis();
   // グラフを再構築（既存のchartインスタンスを破棄して再描画）
   const sc = document.getElementById('sessionChart');
   const dc = document.getElementById('dailyChart');
