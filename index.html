@@ -897,6 +897,151 @@ body{background:var(--bg);color:var(--tx);font-family:-apple-system,'Helvetica N
   </div>
 </div>
 
+<!-- SC抽選の仕組み（新規追加） -->
+<div class="card">
+  <div class="acc-hd" onclick="toggleAcc(this)" style="margin-bottom:0">
+    <span class="acc-arrow">▶</span>🎯 SC当選の仕組み — 役の役割を理解する
+  </div>
+  <div class="acc-body" style="display:none;padding-top:10px">
+
+    <!-- フロー図 -->
+    <div style="background:var(--c2);border-radius:10px;padding:12px;margin-bottom:12px;font-size:12px;line-height:2">
+      <div style="text-align:center;font-size:13px;font-weight:700;color:var(--ye);margin-bottom:8px">SC当選までの流れ</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="background:#1c2128;border-radius:6px;padding:8px;border-left:3px solid var(--bl)">
+          <strong style="color:var(--bl)">① 通常時</strong>（右1stペナルティ注意）<br>
+          <span style="color:var(--mu)">左or中押し1stで消化 → レア役を引くことが最優先</span>
+        </div>
+        <div style="text-align:center;color:var(--mu);font-size:16px">↓</div>
+        <div style="background:#1c2128;border-radius:6px;padding:8px;border-left:3px solid var(--ye)">
+          <strong style="color:var(--ye)">② 役成立 or ゾーン到達</strong><br>
+          <span style="color:var(--mu)">→ SC高確移行を抽選（役によって期待度が異なる）</span>
+        </div>
+        <div style="text-align:center;color:var(--mu);font-size:16px">↓</div>
+        <div style="background:#1c2128;border-radius:6px;padding:8px;border-left:3px solid var(--gn)">
+          <strong style="color:var(--gn)">③ SC高確中</strong><br>
+          <span style="color:var(--mu)">全役でSC抽選 → SC当選期待度 約<strong style="color:var(--gn)">50%</strong></span>
+        </div>
+        <div style="text-align:center;color:var(--mu);font-size:16px">↓</div>
+        <div style="background:#0d1f40;border-radius:6px;padding:8px;border-left:3px solid var(--bl)">
+          <strong style="color:var(--bl)">④ SC（サバンナチャンス）突入</strong><br>
+          <span style="color:var(--mu)">ベル/レア役 → ボーナス高確（期待度約40%）</span>
+        </div>
+        <div style="text-align:center;color:var(--mu);font-size:16px">↓</div>
+        <div style="background:#0f2818;border-radius:6px;padding:8px;border-left:3px solid var(--gn)">
+          <strong style="color:var(--gn)">⑤ BB/RB ボーナス</strong><br>
+          <span style="color:var(--mu)">RB: 押し順ベル → <strong style="color:var(--ye)">66%でSCストック獲得</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 役別SC高確移行期待度 -->
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:700">▼ 役別 SC高確移行 期待度</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:#271a00;border:1px solid var(--ye);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--ye);min-width:100px">チャンス目<br><span style="font-size:10px;color:var(--mu)">1/128</span></div>
+        <div style="flex:1;background:var(--bd);border-radius:3px;height:18px;overflow:hidden"><div style="width:85%;height:100%;background:var(--ye);border-radius:3px"></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--ye);min-width:40px">約40%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:#1e0c38;border:1px solid var(--pu);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--pu);min-width:100px">レアリプレイ<br><span style="font-size:10px;color:var(--mu)">出現頻度低</span></div>
+        <div style="flex:1;background:var(--bd);border-radius:3px;height:18px;overflow:hidden"><div style="width:65%;height:100%;background:var(--pu);border-radius:3px"></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--pu);min-width:40px">高め</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:#0d1f40;border:1px solid var(--bl);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--bl);min-width:100px">チェリー<br><span style="font-size:10px;color:var(--mu)">1/64</span></div>
+        <div style="flex:1;background:var(--bd);border-radius:3px;height:18px;overflow:hidden"><div style="width:45%;height:100%;background:var(--bl);border-radius:3px"></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--bl);min-width:40px">中程度</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:var(--c2);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--mu);min-width:100px">押し順ベル<br><span style="font-size:10px">ハズレ等</span></div>
+        <div style="flex:1;background:var(--bd);border-radius:3px;height:18px;overflow:hidden"><div style="width:10%;height:100%;background:var(--mu);border-radius:3px"></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--mu);min-width:40px">低</div>
+      </div>
+    </div>
+
+    <!-- SC高確の種類 -->
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:700">▼ SC高確の種類（保障G数に注目）</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:#0f2818;border:1px solid var(--gn);border-radius:8px;padding:10px">
+        <div style="font-size:11px;font-weight:800;color:var(--gn);margin-bottom:4px">✅ 保障G数あり<br>（滞在が長い）</div>
+        <div style="font-size:10px;color:var(--mu);line-height:1.7">
+          ・<strong>レア役契機</strong>（チャンス目/チェリー/レアリプレイ）<br>
+          ・<strong>ゾーン契機</strong>（100G/200G/300G等）<br>
+          → SC当選まで高確が続きやすい
+        </div>
+      </div>
+      <div style="background:#2d1a00;border:1px solid var(--or);border-radius:8px;padding:10px">
+        <div style="font-size:11px;font-weight:800;color:var(--or);margin-bottom:4px">⚠️ 保障G数なし<br>（滞在が短い）</div>
+        <div style="font-size:10px;color:var(--mu);line-height:1.7">
+          ・<strong>謎高確</strong>（設定差最大の指標）<br>
+          ・<strong>潜伏区間終了後</strong><br>
+          → 短い場合もあるが発生自体が高設定示唆
+        </div>
+      </div>
+    </div>
+
+    <!-- 通常時の注目ポイント -->
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px;font-weight:700">▼ 通常時の注目ポイント（SC連チャンのカギ）</div>
+    <div style="background:var(--c2);border-radius:8px;padding:12px;font-size:12px;line-height:2">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center">
+        <span style="color:var(--ye);font-weight:700">チャンス目</span><span>→ 出たら注目！約<strong>40%でSC高確</strong>（最重要役）</span>
+        <span style="color:var(--bl);font-weight:700">チェリー</span><span>→ SC高確の契機。よく出る台は好調の可能性</span>
+        <span style="color:var(--or);font-weight:700">夕方背景</span><span>→ SC高確移行中の合図。演出に変化あり</span>
+        <span style="color:var(--gn);font-weight:700">ダチョウ液晶</span><span>→ 青ドットなら特に強い。SC高確示唆</span>
+        <span style="color:var(--pu);font-weight:700">謎高確</span><span>→ 役なし/通常役からいきなり高確。設定差最大</span>
+        <span style="color:var(--mu);font-weight:700">ゾーン到達</span><span>→ 100G・200G・300Gが重要（100Gごと確認）</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 好状態サインチェックリスト -->
+<div class="card">
+  <div class="acc-hd" onclick="toggleAcc(this)" style="margin-bottom:0">
+    <span class="acc-arrow">▶</span>✅ 好状態サイン チェックリスト
+  </div>
+  <div class="acc-body" style="display:none;padding-top:10px">
+    <div style="font-size:11px;color:var(--mu);margin-bottom:6px">以下が重なるほど好調台・続行推奨</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(248,81,73,.1);border-left:3px solid var(--rd);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">🔴</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--rd)">チャンス目が頻出している</div><div style="font-size:10px;color:var(--mu)">1/128が2-3G連続で出る → SC高確移行の大チャンス</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(240,168,58,.1);border-left:3px solid var(--or);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">🌅</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--or)">背景が夕方（オレンジ）に変わった</div><div style="font-size:10px;color:var(--mu)">SC高確突入の合図。チェリー/チャンス目から移行</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(63,185,80,.1);border-left:3px solid var(--gn);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">🐦</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--gn)">液晶をダチョウが通過</div><div style="font-size:10px;color:var(--mu)">青ドットなら特に強い。SC高確継続中の強サイン</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(88,166,255,.1);border-left:3px solid var(--bl);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">🔵</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--bl)">サバチャンランプが青くなった</div><div style="font-size:10px;color:var(--mu)">ストック残り2個以上確定。SC+2セット以上継続確定</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(188,140,255,.1);border-left:3px solid var(--pu);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">💜</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--pu)">謎高確が何度も発生している</div><div style="font-size:10px;color:var(--mu)">レア役なし/ゾーン外から突然SC高確 → 設定差最大指標</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(63,185,80,.1);border-left:3px solid var(--gn);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">👑</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--gn)">RBが来るたびにSCが続く</div><div style="font-size:10px;color:var(--mu)">RB中の押し順ベルで66%ストック獲得 → 超サバへの道</div></div>
+      </div>
+      <div style="display:flex;gap:10px;padding:8px 10px;background:rgba(240,168,58,.1);border-left:3px solid var(--ye);border-radius:0 6px 6px 0">
+        <span style="font-size:16px">⚡</span>
+        <div><div style="font-size:12px;font-weight:700;color:var(--ye)">偶数ゾーンで必ず何か反応する</div><div style="font-size:10px;color:var(--mu)">200G・400G・600G・800Gで高確移行が多い → 高設定示唆</div></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:10px;background:rgba(255,166,87,.08);border-radius:8px;font-size:11px;line-height:1.8;color:var(--mu)">
+      <strong style="color:var(--or)">SC連チャンのカギ:</strong><br>
+      通常時でレア役（チャンス目・チェリー）を多く引く台は設定が高い。<br>
+      レア役→SC高確→SC当選→ボーナス→ストック→SCの連鎖が太い台ほど連チャンする。<br>
+      <strong style="color:var(--ye)">「チャンス目をよく引く台」「背景が夕方になりやすい台」が最強の好調サイン。</strong>
+    </div>
+  </div>
+</div>
+
 </div><!-- /page ref -->
 </div><!-- /p-ref -->
 
