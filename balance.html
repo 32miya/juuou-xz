@@ -103,6 +103,16 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
 
 <div class="page">
 
+<!-- ⓪ 累積収支グラフ（全期間） -->
+<div class="card">
+  <div class="ch">累積収支の推移（全期間）</div>
+  <div class="chart-wrap">
+    <canvas id="totalChart"></canvas>
+    <div class="chart-empty" id="totalEmpty" style="display:none">保存済みセッションがありません</div>
+  </div>
+  <div style="font-size:10px;color:var(--mu);text-align:center" id="totalNote"></div>
+</div>
+
 <!-- ① 現在のセッション -->
 <div class="card">
   <div class="ch">現在のセッション（未保存）</div>
@@ -352,6 +362,8 @@ window.addEventListener('load', () => {
   calcCur();
   renderSummary();
   renderBudgetAnalysis();
+  buildTotalChart();
+  buildTotalChart();
   buildSessionChart();
   buildDailyChart();
   buildSessionTable();
@@ -654,6 +666,7 @@ function buildMixedChart(canvasId, emptyId, labels, perData, cumData) {
     return;
   }
 
+  Chart.getChart(canvas)?.destroy();
   new Chart(canvas, {
     data: {
       labels,
@@ -687,6 +700,63 @@ function buildMixedChart(canvasId, emptyId, labels, perData, cumData) {
     },
     options: CHART_DEFAULTS,
   });
+}
+
+/* ─────────────────────────
+   TOTAL CUMULATIVE CHART
+───────────────────────── */
+function buildTotalChart() {
+  const canvas = document.getElementById('totalChart');
+  const empty  = document.getElementById('totalEmpty');
+  const note   = document.getElementById('totalNote');
+  Chart.getChart(canvas)?.destroy();
+  const sessions = STORE.all()
+    .map((s, i) => ({ s, i }))
+    .sort((a, b) => (a.s.date || '').localeCompare(b.s.date || '') || a.i - b.i)
+    .map(x => x.s);
+
+  if (!sessions.length) {
+    canvas.style.display = 'none';
+    empty.style.display  = 'block';
+    note.textContent = '';
+    return;
+  }
+  canvas.style.display = '';
+  empty.style.display  = 'none';
+
+  const labels  = ['開始', ...sessions.map(s => {
+    const d = s.date ? s.date.slice(5).replace('-','/') : '—';
+    return `${d} 第${s.machineNum||'?'}台`;
+  })];
+  const cumData = [0, ...makeCumulativeData(sessions.map(s => s.balanceYen || 0))];
+  const last = cumData[cumData.length - 1];
+  const color = last >= 0 ? '#3fb950' : '#f85149';
+
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '累積収支',
+        data: cumData,
+        borderColor: color,
+        backgroundColor: last >= 0 ? 'rgba(63,185,80,.10)' : 'rgba(248,81,73,.10)',
+        fill: 'origin',
+        tension: 0.3,
+        pointRadius: 3,
+        pointBackgroundColor: cumData.map(v => v >= 0 ? '#3fb950' : '#f85149'),
+        pointBorderColor: '#0d1117',
+        pointBorderWidth: 1,
+        borderWidth: 2,
+      }]
+    },
+    options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } },
+  });
+
+  const first = sessions[0].date || '—', end = sessions[sessions.length-1].date || '—';
+  const peak = Math.max(...cumData), low = Math.min(...cumData);
+  const fmt = v => (v >= 0 ? '+' : '') + v.toLocaleString() + '円';
+  note.textContent = `${first} 〜 ${end}（${sessions.length}台）／ 最高 ${fmt(peak)} ／ 最低 ${fmt(low)}`;
 }
 
 /* ─────────────────────────
