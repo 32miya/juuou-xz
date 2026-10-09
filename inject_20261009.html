@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>データ注入 2026-10-09</title>
+<style>
+body{background:#0d1117;color:#f0f6fc;font-family:sans-serif;padding:24px;max-width:400px;margin:0 auto}
+.ok{color:#3fb950;font-size:18px;font-weight:700;margin-top:16px}
+.err{color:#f85149}
+button{padding:12px 24px;background:#238636;border:none;border-radius:8px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;width:100%}
+pre{background:#161b22;padding:12px;border-radius:8px;font-size:12px;overflow-x:auto;margin-top:12px}
+</style>
+</head>
+<body>
+<h2>📊 セッションデータ注入</h2>
+<p style="color:#7d8590;font-size:13px">2026-10-09 の獣王データを収支レポートに追加します</p>
+
+<pre id="preview"></pre>
+<button onclick="inject()">✅ データを追加する</button>
+<div id="result"></div>
+
+<script>
+const SESSION = {
+  id: 'manual_20261009_' + Date.now(),
+  date: '2026-10-09',
+  machineNum: null,          // 自動設定
+  machineName: '台621',
+  rate: 20,
+  startTime: '',
+  endTime: '',
+  totalG: 5609,              // 非AT G（初当たり20回×推定280G）
+  finalG: 0,
+  scCount: 20,               // 初当たりSC（設定推定用）
+  avgHit: 280,               // 5609/20 = 280G ≈ 1/279.7G（設定6）
+  sabaRen: 9,                // グラフ最大9連
+  totalAtG: 1222,            // 総ARTゲーム
+  superSaba: 0,
+  rbCount: 7,
+  totalScAll: 62,            // 総SC（チェーン含む）
+  triggers: {A:0,B:0,C:0,D:0},
+  highStats: {high:{entered:0,hit:0},sp:{entered:0,hit:0},mystery:{entered:0,hit:0}},
+  finalMedals: 3038,
+  investYen: Math.round(5609 * (1000/31.8)),  // ≈ 176,226円
+  balanceYen: 60700,         // 3035枚 × 20円（マイスロ 最大差枚数より）
+  memo: 'ART突入69回(初当たり20回) 総SC62回 RB7回 最大9連 最大差枚数3035枚 台番号621',
+  manual: true,
+};
+
+document.getElementById('preview').textContent = JSON.stringify(SESSION, null, 2);
+
+function inject() {
+  try {
+    const KEY = 'juuou_sess_v3';
+    const all = JSON.parse(localStorage.getItem(KEY) || '[]');
+
+    // 同じ日のセッション数を数えて台番号を設定
+    const same = all.filter(s => s.date === SESSION.date).length;
+    SESSION.machineNum = same + 1;
+
+    // 既に同じ日のデータがあれば確認
+    if (same > 0) {
+      if (!confirm(`${SESSION.date} のデータが既に${same}件あります。追加しますか？`)) return;
+    }
+
+    all.push(SESSION);
+    localStorage.setItem(KEY, JSON.stringify(all));
+
+    document.getElementById('result').innerHTML =
+      `<div class="ok">✅ 保存完了！<br>${SESSION.date} 第${SESSION.machineNum}台 / 収支: +${SESSION.balanceYen.toLocaleString()}円<br><br>このタブを閉じて収支レポートを確認してください。</div>`;
+  } catch(e) {
+    document.getElementById('result').innerHTML = `<div class="err">❌ エラー: ${e.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>
