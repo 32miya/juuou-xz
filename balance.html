@@ -206,12 +206,15 @@ hr.dv{border:none;border-top:1px solid var(--bd);margin:10px 0}
 <div class="card">
   <div class="ch" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
     <span>セッション詳細</span>
-    <button class="add-session-btn" style="width:auto;padding:6px 12px;font-size:12px;margin-bottom:0" onclick="openAddModal()">＋ 過去の記録を追加</button>
+    <div style="display:flex;gap:6px">
+      <button class="add-session-btn" style="width:auto;padding:6px 10px;font-size:12px;margin-bottom:0;background:#0d1f40;color:var(--bl);border:1px solid var(--bl)" onclick="loadCurrentSession()">📲 今日のセッションを読込</button>
+      <button class="add-session-btn" style="width:auto;padding:6px 10px;font-size:12px;margin-bottom:0" onclick="openAddModal()">＋ 過去の記録を追加</button>
+    </div>
   </div>
   <div style="overflow-x:auto">
     <table class="dtable" id="sessTable">
       <thead>
-        <tr><th>日付・台</th><th>総G</th><th>SC/RB</th><th>ATG</th><th>収支</th><th></th></tr>
+        <tr><th>日付・台</th><th>総G<br><span style="font-size:9px;font-weight:400">初当りG</span></th><th>SC/RB/連</th><th>ATG</th><th>収支</th><th></th></tr>
       </thead>
       <tbody id="sessBody">
         <tr><td colspan="6" style="color:var(--mu);text-align:center;padding:16px">データなし</td></tr>
@@ -388,11 +391,21 @@ function initSeed() {
       id: '20261007_624',
       date: '2026-10-07', machineNum: 1, machineName: '#624', rate: 20,
       startTime: '', endTime: '',
-      totalG: 8442,        // 推定: ART102×66 + AT1710G
+      totalG: 8442,
       scCount: 102, avgHit: 83,
       sabaRen: 48, superSaba: 1, rbCount: 13, totalAtG: 1710,
       memo: 'ART102回/RB13/48連(超サバ到達) #624 最高7824枚 投資45,000円',
       finalMedals: 7619, investYen: 45000, balanceYen: 7619*20-45000, manual: true,
+    },
+    // ── 2026-10-09 台621 ──
+    {
+      id: '20261009_621',
+      date: '2026-10-09', machineNum: 1, machineName: '台621', rate: 20,
+      startTime: '', endTime: '',
+      totalG: 5609, scCount: 20, avgHit: 280,
+      sabaRen: 9, superSaba: 0, rbCount: 7, totalAtG: 1222, totalScAll: 62,
+      memo: 'ART突入69回(初当たり20回) 総SC62回 RB7回 最大9連 最大差枚数3035枚',
+      finalMedals: 3038, investYen: 176226, balanceYen: 60700, manual: true,
     },
   ];
 
@@ -815,7 +828,7 @@ function buildSessionTable() {
         <span style="font-size:10px;color:var(--mu)">${s.startTime||''}${s.endTime?'〜'+s.endTime:''}</span>
         ${memo}
       </td>
-      <td style="font-size:12px">${(s.totalG||0).toLocaleString()}G</td>
+      <td style="font-size:12px">${(s.totalG||0).toLocaleString()}G<br><span style="font-size:10px;color:var(--ye)">${avg}</span></td>
       <td style="font-size:12px">${s.scCount||0}<span style="color:var(--mu)">回</span><br><span style="font-size:10px;color:var(--bl)">RB${s.rbCount||0}</span>${sabaStr}</td>
       <td style="font-size:12px">${atgStr}</td>
       <td class="${cls} bold">${(bal>=0?'+':'')+bal.toLocaleString()}円</td>
@@ -837,6 +850,23 @@ function deleteSession(index) {
 ───────────────────────── */
 let mRate = 20, mMethod = 'medal';
 
+function loadCurrentSession() {
+  const cur = STORE.cur();
+  if (!cur) { alert('index.htmlで進行中のセッションが見つかりません。\n先にindex.htmlでデータを入力してください。'); return; }
+  const today = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  openAddModal({
+    date: today,
+    machine: cur.machineName || '',
+    totalG: cur.sessionG || 0,
+    sc: cur.scCount || 0,
+    rb: 0,
+    maxRen: cur.sabaRen || 0,
+    atg: cur.totalAtG || 0,
+    memo: `SC${cur.scCount||0}回 / ${cur.sessionG||0}G / 最大${cur.sabaRen||0}連`,
+  });
+  document.getElementById('mDate').value = today;
+}
+
 function openAddModal(prefill) {
   // デフォルト: 昨日の日付
   const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
@@ -851,6 +881,8 @@ function openAddModal(prefill) {
     if (prefill.sc)      document.getElementById('mSC').value      = prefill.sc;
     if (prefill.rb)      document.getElementById('mRB').value      = prefill.rb;
     if (prefill.maxRen)  document.getElementById('mMaxRen').value  = prefill.maxRen;
+    if (prefill.atg)     document.getElementById('mATG').value     = prefill.atg;
+    if (prefill.date)    document.getElementById('mDate').value    = prefill.date;
     if (prefill.memo)    document.getElementById('mMemo').value    = prefill.memo;
   } else {
     document.getElementById('photoHint').style.display = 'none';
